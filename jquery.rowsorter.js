@@ -114,7 +114,7 @@
 
             target = $(target).closest("tr");
 
-            if (target && target[0] !== dragging_row[0] && target[0].parentNode === tbody[0]) {
+            if (target && target[0] !== dragging_row[0] && target.parentNode === tbody[0]) {
                 moveFuncCore(target, touch.pageY);
             }
         }
