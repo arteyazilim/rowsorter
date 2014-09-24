@@ -8,7 +8,7 @@
         onselect    = !!('onselectstart' in document[0].documentElement),
         dragging = false,
         defaultOptions = {
-            handler          : "tr",
+            handler          : "tbody > tr",
             tableDragClass   : "sorting-table",
             disabledRowClass : "nodrag",
             dragClass        : "sorting-row",
@@ -39,12 +39,12 @@
         }
 
         // add mouse down event handler on table
-        table.on(downEvent, settings.handler||"tr", downFunc);
+        table.on(downEvent, settings.handler, downFunc);
 
         // mouse down event
         function downFunc(event)
         {
-            // get body
+            // get body if exist, otherwise use table as tbody
             tbody = table.find("tbody");
             tbody = tbody.length > 0 ? tbody : table;
 
