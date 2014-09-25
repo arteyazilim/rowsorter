@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>jquery.rowsorter.js</title>
+    <script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../jquery.rowsorter.js"></script>
+</head>
+<body>
+
+<style>
+    div.work {
+        float: left;
+        width: 420px;
+        height: 400px;
+        margin: 20px 0 0 20px;
+        overflow: auto;
+    }
+    pre {
+        float: left;
+        margin-top: 20px;
+        padding: 8px;
+        width: 490px;
+        height: 400px;
+        overflow: auto;
+        background: #eee;
+        font-family: consolas, "courier new";
+        font-size: 14px;
+    }
+    #log {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 5px;
+        width: 390px;
+        background: #eee;
+    }
+
+    table {width: 400px; font-size: 14px; font-family: tahoma, arial, sans-serif;}
+    table thead th {background-color: #ccc; padding: 5px 8px;}
+    table td {background-color: #ddd; padding: 5px 8px;}
+
+    table.sorting-table {cursor: move;}
+    table tr.sorting-row td {background-color: #8b8;}
+</style>
+<div class="work">
+    <table id="table1">
+        <thead>
+            <tr>
+                <th colspan="3">Basic Sorting</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Row 1</td>
+                <td>Sample Content 1</td>
+                <td>Sample Content 1</td>
+            </tr>
+            <tr>
+                <td>Row 2</td>
+                <td>Sample Content 2</td>
+                <td>Sample Content 2</td>
+            </tr>
+            <tr>
+                <td>Row 3</td>
+                <td>Sample Content 3</td>
+                <td>Sample Content 3</td>
+            </tr>
+            <tr>
+                <td>Row 4</td>
+                <td>Sample Content 4</td>
+                <td>Sample Content 4</td>
+            </tr>
+            <tr>
+                <td>Row 5</td>
+                <td>Sample Content 5</td>
+                <td>Sample Content 5</td>
+            </tr>
+        </tbody>
+    </table>
+    <code id="log"></code>
+</div>
+<pre>
+&lt;table id="table1"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th colspan="3"&gt;Basic Sorting&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Row 1&lt;/td&gt;
+            &lt;td&gt;Sample Content 1&lt;/td&gt;
+            &lt;td&gt;Sample Content 1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Row 2&lt;/td&gt;
+            &lt;td&gt;Sample Content 2&lt;/td&gt;
+            &lt;td&gt;Sample Content 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Row 3&lt;/td&gt;
+            &lt;td&gt;Sample Content 3&lt;/td&gt;
+            &lt;td&gt;Sample Content 3&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Row 4&lt;/td&gt;
+            &lt;td&gt;Sample Content 4&lt;/td&gt;
+            &lt;td&gt;Sample Content 4&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Row 5&lt;/td&gt;
+            &lt;td&gt;Sample Content 5&lt;/td&gt;
+            &lt;td&gt;Sample Content 5&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;script type="text/javascript"&gt;
+    $("#table1").rowSorter({
+        onDrop: function(tbody, row, new_index, old_index) {
+            $("#log").html(old_index + ". row moved to " + new_index);
+        }
+    });
+&lt;/script&gt;
+</pre>
+
+<script type="text/javascript">
+
+    $("#table1").rowSorter({
+        onDrop: function(tbody, row, new_index, old_index) {
+            $("#log").html(old_index + ". row moved to " + new_index);
+        }
+    });
+
+</script>
+
+</body>
+</html>
