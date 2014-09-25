@@ -26,7 +26,7 @@
 
     function RowSorter(table, options)
     {
-        var settings = $.extend(defaultOptions, options),
+        var settings = $.extend({}, defaultOptions, options),
             tbody = null, rows = null, dragging_row = null,
             last_y = 0, old_index = 0;
 
