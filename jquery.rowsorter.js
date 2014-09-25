@@ -38,8 +38,12 @@
             throw new Error("Specified parameter is not a table.");
         }
 
-        // add mouse down event handler on table
-        table.on(downEvent, settings.handler, downFunc);
+        // if row sorter didn't attached previously
+        if (table.data("row-sorter-attached") !== true) {
+            // add mouse down event handler on table
+            table.on(downEvent, settings.handler, downFunc);
+            table.data("row-sorter-attached", true);
+        }
 
         // mouse down event
         function downFunc(event)
