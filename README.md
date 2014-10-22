@@ -31,7 +31,7 @@ RowSorter.js
 
         // old_index is stored index of row in table/tbody before we have dragged the row.
         // new_index is index of row in table/tbody after the row has been dragged.
-        console.log(table, row, index, old_index, new_index);
+        console.log(table, row, old_index, new_index);
     }
 ```
 
