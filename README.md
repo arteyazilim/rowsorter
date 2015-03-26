@@ -12,6 +12,7 @@ RowSorter.js
     disabledRowClass : undraggable rows' class name for disabling the drag (default: "nodrag").
     dragClass        : dragging row's class name (default: "sorting-row").
     onDragStart      : (default: null)
+    onBeforeMove     : Called before dragged row changes position. Abort move by returning false. (default: null)
     onDrop           : (default: null)
 
 #### Using Event Handlers
@@ -22,6 +23,15 @@ RowSorter.js
 
         // old_index is zero-based index of row in table (or tbody if exists)
         console.log(table, row, old_index);
+    }
+
+    onBeforeMove: function(new_index, old_index) {
+        // Don't move if the dragged row is about to move to the top.
+        // This makes the top row sticky if it's also disabled
+        if(new_index === 0) {
+            // Returning false will abort the move
+            return false;
+        }
     }
 
     // if new_index === old_index, this function won't be called.
