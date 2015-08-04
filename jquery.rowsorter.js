@@ -13,6 +13,7 @@
             disabledRowClass : "nodrag",
             dragClass        : "sorting-row",
             onDragStart      : null,
+            onBeforeMove     : null,
             onDrop           : null
         };
 
@@ -143,6 +144,17 @@
 
         function moveFuncCore(element, current_y)
         {
+            // call the move function
+            if (typeof settings.onBeforeMove === "function") {
+                var tmpOld = tbody.find("tr").index(dragging_row[0]);
+                var tmpNew = current_y > last_y ? tmpOld + 1 : tmpOld - 1;
+
+                // Abort if so wanted
+                if(settings.onBeforeMove(tmpNew, tmpOld) === false) {
+                    return;
+                }
+            }
+
             // if mouse moving to downward and focused element's next sibling is not the dragging row
             if (current_y > last_y && element.nextSibling !== dragging_row[0]) {
 
