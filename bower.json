@@ -1,0 +1,21 @@
+{
+  "name": "rowsorter",
+  "version": "1.0.9",
+  "description": "JQuery drag 'n drop table row sorter pluging with touch support.",
+  "main": "jquery.rowsorter.min.js",
+  "keywords": [
+    "row sorting"
+  ],
+  "authors": [
+    "Gökhan Bora"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/borayazilim/rowsorter",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
