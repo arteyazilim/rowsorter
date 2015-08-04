@@ -9,6 +9,10 @@
   "authors": [
     "Gökhan Bora"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:borayazilim/rowsorter.git"
+  }
   "license": "MIT",
   "homepage": "https://github.com/borayazilim/rowsorter",
   "ignore": [
