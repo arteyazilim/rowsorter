@@ -1,11 +1,26 @@
-(function(window, $) {
+(function(factory) {
+
+    'use strict';
+
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], factory);
+    } else if (typeof exports === 'object') {
+        // Node/CommonJS
+        factory(require('jquery'));
+    } else {
+        // Browser globals
+        factory(window.jQuery);
+    }
+
+})(function($) {
     "use strict";
 
-    var document    = $(window.document),
+    var document = $(window.document),
         touchDevice = !!('ontouchstart' in document[0].documentElement),
-        downEvent   = touchDevice ? 'touchstart' : 'mousedown',
-        upEvent     = touchDevice ? 'touchend'   : 'mouseup',
-        onselect    = !!('onselectstart' in document[0].documentElement),
+        downEvent = touchDevice ? 'touchstart' : 'mousedown',
+        upEvent = touchDevice ? 'touchend' : 'mouseup',
+        onselect = !!('onselectstart' in document[0].documentElement),
         dragging = false,
         defaultOptions = {
             handler          : "tbody > tr",
@@ -203,7 +218,9 @@
 
             if (new_index !== old_index) {
                 if (typeof settings.onDrop === "function") {
-                    settings.onDrop(tbody[0], dragging_row[0], new_index, old_index);
+                    (function(table, row, ind_new, ind_old){
+                        settings.onDrop(table, row, ind_new, ind_old);
+                    })(tbody[0], dragging_row[0], new_index, old_index);
                 }
             }
 
@@ -221,5 +238,4 @@
             });
         }
     });
-
-})(this, this.jQuery);
+});

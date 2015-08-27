@@ -1,7 +1,7 @@
 RowSorter.js
 ============
 ## Drag 'n drop row sorter plugin.
-* Small size - 2kb minified (~7kb non-minified).
+* Small size - 2kb minified (~8kb non-minified).
 * Touch devices are supported.
 * Supports IE8+ (not tested with ie7) and all other modern browsers.
 
@@ -50,6 +50,7 @@ RowSorter.js
 * [Basic Usage][basic]
 * [Custom Handler 1][handler1]
 * [Custom Handler 2][handler2]
+* [Move Handler][movehandler]
 * [Disabled Row][disabled]
 * [Custom CSS][style]
 
@@ -57,5 +58,6 @@ RowSorter.js
 [basic]: http://borayazilim.com/projects/rowsorter/samples/basic.html
 [handler1]: http://borayazilim.com/projects/rowsorter/samples/handler1.html
 [handler2]: http://borayazilim.com/projects/rowsorter/samples/handler2.html
+[movehandler]: http://borayazilim.com/projects/rowsorter/samples/move-handler.html
 [disabled]: http://borayazilim.com/projects/rowsorter/samples/disabled.html
 [style]: http://borayazilim.com/projects/rowsorter/samples/style.html
