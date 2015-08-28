@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Rowsorter by borayazilim</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Rowsorter</h1>
+        <p>JQuery drag &#39;n drop table row sorter pluging with touch support.</p>
+
+        <p class="view"><a href="https://github.com/borayazilim/rowsorter">View the Project on GitHub <small>borayazilim/rowsorter</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/borayazilim/rowsorter/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/borayazilim/rowsorter/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/borayazilim/rowsorter">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="rowsorterjs" class="anchor" href="#rowsorterjs" aria-hidden="true"><span class="octicon octicon-link"></span></a>RowSorter.js</h1>
+
+<h2>
+<a id="drag-n-drop-row-sorter-plugin" class="anchor" href="#drag-n-drop-row-sorter-plugin" aria-hidden="true"><span class="octicon octicon-link"></span></a>Drag 'n drop row sorter plugin.</h2>
+
+<ul>
+<li>Small size - 2kb minified (~8kb non-minified).</li>
+<li>Touch devices are supported.</li>
+<li>Supports IE8+ (not tested with ie7) and all other modern browsers.</li>
+</ul>
+
+<h3>
+<a id="options" class="anchor" href="#options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Options:</h3>
+
+<pre><code>handler          : drag handler selector (default: "tr")
+tableDragClass   : adds this class name to table while rows are sorting (default: "sorting-table")
+disabledRowClass : undraggable rows' class name for disabling the drag (default: "nodrag").
+dragClass        : dragging row's class name (default: "sorting-row").
+onDragStart      : (default: null)
+onBeforeMove     : Called before dragged row changes position. Abort move by returning false. (default: null)
+onDrop           : (default: null)
+</code></pre>
+
+<h4>
+<a id="using-event-handlers" class="anchor" href="#using-event-handlers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using Event Handlers</h4>
+
+<div class="highlight highlight-javascript"><pre>    <span class="pl-en">onDragStart</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">tbody</span>, <span class="pl-smi">row</span>, <span class="pl-smi">old_index</span>) {
+        <span class="pl-c">// finding the table</span>
+        <span class="pl-k">var</span> table <span class="pl-k">=</span> tbody.<span class="pl-c1">nodeName</span> <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">"</span>TBODY<span class="pl-pds">"</span></span> <span class="pl-k">?</span> tbody.<span class="pl-c1">parentNode</span> <span class="pl-k">:</span> tbody;
+
+        <span class="pl-c">// old_index is zero-based index of row in table (or tbody if exists)</span>
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(table, row, old_index);
+    }
+
+    <span class="pl-en">onBeforeMove</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">tbody</span>, <span class="pl-smi">row</span>, <span class="pl-smi">new_index</span>, <span class="pl-smi">old_index</span>) {
+        <span class="pl-c">// Don't move if the dragged row is about to move to the top.</span>
+        <span class="pl-c">// This makes the top row sticky if it's also disabled.</span>
+        <span class="pl-k">if</span> (new_index <span class="pl-k">===</span> <span class="pl-c1">0</span>) {
+            <span class="pl-c">// Returning false will abort the move.</span>
+            <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+        }
+    }
+
+    <span class="pl-c">// if new_index === old_index, this function won't be called.</span>
+    <span class="pl-en">onDrop</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">tbody</span>, <span class="pl-smi">row</span>, <span class="pl-smi">new_index</span>, <span class="pl-smi">old_index</span>) {
+        <span class="pl-c">// finding the table</span>
+        <span class="pl-k">var</span> table <span class="pl-k">=</span> tbody.<span class="pl-c1">nodeName</span> <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">"</span>TBODY<span class="pl-pds">"</span></span> <span class="pl-k">?</span> tbody.<span class="pl-c1">parentNode</span> <span class="pl-k">:</span> tbody;
+
+        <span class="pl-c">// old_index is stored index of row in table/tbody before we have dragged the row.</span>
+        <span class="pl-c">// new_index is index of row in table/tbody after the row has been dragged.</span>
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(table, row, new_index, old_index);
+    }</pre></div>
+
+<h3>
+<a id="sample-usages" class="anchor" href="#sample-usages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sample Usages</h3>
+
+<ul>
+<li><a href="http://borayazilim.com/projects/rowsorter/samples/basic.html">Basic Usage</a></li>
+<li><a href="http://borayazilim.com/projects/rowsorter/samples/handler1.html">Custom Handler 1</a></li>
+<li><a href="http://borayazilim.com/projects/rowsorter/samples/handler2.html">Custom Handler 2</a></li>
+<li><a href="http://borayazilim.com/projects/rowsorter/samples/move-handler.html">Move Handler</a></li>
+<li><a href="http://borayazilim.com/projects/rowsorter/samples/disabled.html">Disabled Row</a></li>
+<li><a href="http://borayazilim.com/projects/rowsorter/samples/style.html">Custom CSS</a></li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/borayazilim">borayazilim</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
