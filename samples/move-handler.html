@@ -117,9 +117,9 @@
 
 &lt;script type="text/javascript"&gt;
     $("#table1").rowSorter({
-        onBeforeMove: function(new_index, old_index) {
+        onBeforeMove: function(table, row, new_index, old_index) {
             $("#log").html("Moved from " + old_index + " to " + new_index);
-            if(new_index === 0) {
+            if (new_index === 0) {
                 $("#log").html("First row is sticky, can't move there!");
                 return false;
             }
@@ -131,12 +131,14 @@
 <script type="text/javascript">
 
     $("#table1").rowSorter({
-        onBeforeMove: function(new_index, old_index) {
-            $("#log").html("Moved from " + old_index + " to " + new_index);
-            if(new_index === 0) {
+        onBeforeMove: function(tbody, row, new_index, old_index) {
+            if (new_index === 0) {
                 $("#log").html("First row is sticky, can't move there!");
                 return false;
             }
+        },
+        onDrop: function(tbody, row, new_index, old_index) {
+            $("#log").html("Moved from " + old_index + " to " + new_index);
         }
     });
 

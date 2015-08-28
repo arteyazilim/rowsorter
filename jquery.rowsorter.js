@@ -61,6 +61,11 @@
             table.data("row-sorter-attached", true);
         }
 
+        // for performance, test event method here.
+        if (typeof settings.onBeforeMove !== "function") {
+            settings.onBeforeMove = false;
+        }
+
         // mouse down event
         function downFunc(event)
         {
@@ -136,7 +141,6 @@
                 target = document[0].elementFromPoint(touch.clientX, touch.clientY);
 
             // if we can't find any element, fall back.
-            // this is impossible, but i'm not sure.
             if (!target) {
                 return true;
             }
@@ -160,27 +164,26 @@
         function moveFuncCore(element, current_y)
         {
             // call the move function
-            if (typeof settings.onBeforeMove === "function") {
-                var tmpOld = tbody.find("tr").index(dragging_row[0]);
-                var tmpNew = current_y > last_y ? tmpOld + 1 : tmpOld - 1;
+            if (settings.onBeforeMove) {
+                var new_index = tbody.find("tr").index(element);
 
                 // Abort if so wanted
-                if(settings.onBeforeMove(tmpNew, tmpOld) === false) {
+                if (settings.onBeforeMove(tbody[0], dragging_row[0], new_index, old_index) === false) {
                     return;
                 }
             }
 
-            // if mouse moving to downward and focused element's next sibling is not the dragging row
+            // if mouse moving to downward and hover element's next sibling is not the dragging row
             if (current_y > last_y && element.nextSibling !== dragging_row[0]) {
 
-                // if current row is not the last child of whole table
+                // if current row is not the last child of the table
                 if (element.nextSibling) {
                     tbody[0].insertBefore(dragging_row[0], element.nextSibling);
                 } else {
                     tbody[0].appendChild(dragging_row[0]);
                 }
 
-            // if mouse moving to upward and focused element's prev sibling is not the dragging row
+            // if mouse moving to upward and hover element's prev sibling is not the dragging row
             } else if (current_y <= last_y && element.previousSibling !== dragging_row[0]) {
                 tbody[0].insertBefore(dragging_row[0], element);
             }
@@ -192,8 +195,6 @@
         // fires on mouse up on document
         function upFunc()
         {
-            var new_index;
-
             // remove move event from all rows
             if (touchDevice) {
                 document.off("touchmove", touchMoveFunc);
@@ -214,7 +215,7 @@
                 table.removeClass(settings.tableDragClass);
             }
 
-            new_index = tbody.find("tr").index(dragging_row[0]);
+            var new_index = tbody.find("tr").index(dragging_row[0]);
 
             if (new_index !== old_index) {
                 if (typeof settings.onDrop === "function") {

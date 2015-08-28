@@ -25,23 +25,23 @@ RowSorter.js
         console.log(table, row, old_index);
     }
 
-    onBeforeMove: function(new_index, old_index) {
+    onBeforeMove: function(tbody, row, new_index, old_index) {
         // Don't move if the dragged row is about to move to the top.
-        // This makes the top row sticky if it's also disabled
-        if(new_index === 0) {
-            // Returning false will abort the move
+        // This makes the top row sticky if it's also disabled.
+        if (new_index === 0) {
+            // Returning false will abort the move.
             return false;
         }
     }
 
     // if new_index === old_index, this function won't be called.
-    onDrop: function(tbody, row, old_index, new_index) {
+    onDrop: function(tbody, row, new_index, old_index) {
         // finding the table
         var table = tbody.nodeName === "TBODY" ? tbody.parentNode : tbody;
 
         // old_index is stored index of row in table/tbody before we have dragged the row.
         // new_index is index of row in table/tbody after the row has been dragged.
-        console.log(table, row, old_index, new_index);
+        console.log(table, row, new_index, old_index);
     }
 ```
 
