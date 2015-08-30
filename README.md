@@ -5,6 +5,13 @@ RowSorter.js
 * Touch devices are supported.
 * Supports IE8+ (not tested with ie7) and all other modern browsers.
 
+### Install
+    bower install rowsorter
+### Manuel Install
+```html
+<script type="text/javascript" src="/path/jquery.rowsorter.min.js"></script>
+```
+
 ### Options:
 
     handler          : drag handler selector (default: "tr")
