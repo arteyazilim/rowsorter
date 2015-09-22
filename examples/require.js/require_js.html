@@ -2,9 +2,13 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>jquery.rowsorter.js</title>
-    <script type="text/javascript" src="jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="../jquery.rowsorter.js"></script>
+    <title>rowsorter.js with require.js</title>
+    <script type="text/javascript" src="require.js"></script>
+    <script type="text/javascript">
+    requirejs.config({
+        baseUrl: '../../dist/'
+    });
+    </script>
 </head>
 <body>
 
@@ -46,11 +50,11 @@
     <table id="table1">
         <thead>
             <tr>
-                <th colspan="3">Handling Move</th>
+                <th colspan="3">Basic Sorting</th>
             </tr>
         </thead>
         <tbody>
-            <tr class="nodrag">
+            <tr>
                 <td>Row 1</td>
                 <td>Sample Content 1</td>
                 <td>Sample Content 1</td>
@@ -83,11 +87,11 @@
 &lt;table id="table1"&gt;
     &lt;thead&gt;
         &lt;tr&gt;
-            &lt;th colspan="3"&gt;Handling Move&lt;/th&gt;
+            &lt;th colspan="3"&gt;Basic Sorting&lt;/th&gt;
         &lt;/tr&gt;
     &lt;/thead&gt;
     &lt;tbody&gt;
-        &lt;tr class="nodrag"&gt;
+        &lt;tr&gt;
             &lt;td&gt;Row 1&lt;/td&gt;
             &lt;td&gt;Sample Content 1&lt;/td&gt;
             &lt;td&gt;Sample Content 1&lt;/td&gt;
@@ -116,32 +120,28 @@
 &lt;/table&gt;
 
 &lt;script type="text/javascript"&gt;
-    $("#table1").rowSorter({
-        onBeforeMove: function(table, row, new_index, old_index) {
-            $("#log").html("Moved from " + old_index + " to " + new_index);
-            if (new_index === 0) {
-                $("#log").html("First row is sticky, can't move there!");
-                return false;
-            }
+require(['RowSorter'], function(RowSorter)
+{
+    RowSorter(document.getElementById('table1'), {
+        onDrop: function(tbody, row, new_index, old_index) {
+            var table = tbody.nodeName === 'TBODY' ? tbody.parentNode : tbody;
+            document.getElementById('log').innerHTML = (old_index + 1) + '. row moved to ' + (new_index + 1);
         }
     });
+});
 &lt;/script&gt;
 </pre>
 
 <script type="text/javascript">
-
-    $("#table1").rowSorter({
-        onBeforeMove: function(tbody, row, new_index, old_index) {
-            if (new_index === 0) {
-                $("#log").html("First row is sticky, can't move there!");
-                return false;
-            }
-        },
+require(['RowSorter'], function(RowSorter)
+{
+    RowSorter(document.getElementById('table1'), {
         onDrop: function(tbody, row, new_index, old_index) {
-            $("#log").html("Moved from " + old_index + " to " + new_index);
+            var table = tbody.nodeName === 'TBODY' ? tbody.parentNode : tbody;
+            document.getElementById('log').innerHTML = (old_index + 1) + '. row moved to ' + (new_index + 1);
         }
     });
-
+});
 </script>
 
 </body>

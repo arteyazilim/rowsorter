@@ -1,8 +1,8 @@
 {
   "name": "rowsorter",
-  "version": "1.0.9",
-  "description": "JQuery drag 'n drop table row sorter pluging with touch support.",
-  "main": "jquery.rowsorter.min.js",
+  "version": "2.0.0",
+  "description": "Drag & drop table row sorter pluging with touch support for Vanilla JS and jQuery.",
+  "main": "dist/RowSorter.js",
   "keywords": [
     "row sorting"
   ],
@@ -19,7 +19,6 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "test",
-    "tests"
+    "samples"
   ]
 }

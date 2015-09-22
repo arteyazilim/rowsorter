@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>new rowsorter.js</title>
+    <script type="text/javascript" src="../dist/RowSorter.js"></script>
+</head>
+<body>
+
+<style>
+table {width: 400px; font-size: 14px; font-family: tahoma, arial, sans-serif;}
+table thead th {background-color: #ccc; padding: 5px 8px;}
+table td {background-color: #ddd; padding: 5px 8px;}
+
+table.sorting-table {cursor: move;}
+table tr.sorting-row td {background-color: #8b8;}
+table td.sorter {background-color: #f80; width: 10px; cursor: move;}
+</style>
+
+<table id="table1">
+    <thead>
+        <tr>
+            <th colspan="4">Basic Sorting</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td></td>
+            <td>Row 1</td>
+            <td>Sample Content 1</td>
+            <td>Sample Content 1</td>
+        </tr>
+        <tr>
+            <td class="sorter"></td>
+            <td>Row 2</td>
+            <td>Sample Content 2</td>
+            <td>Sample Content 2</td>
+        </tr>
+        <tr>
+            <td class="sorter"></td>
+            <td>Row 3</td>
+            <td>Sample Content 3</td>
+            <td>Sample Content 3</td>
+        </tr>
+        <tr>
+            <td class="sorter"></td>
+            <td>Row 4</td>
+            <td>Sample Content 4</td>
+            <td>Sample Content 4</td>
+        </tr>
+        <tr>
+            <td class="sorter"></td>
+            <td>Row 5</td>
+            <td>Sample Content 5</td>
+            <td>Sample Content 5</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4" id="logarea">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="4"><button type="button" onclick="killRowSorter();">Kill RowSorter</button></td>
+        </tr>
+    </tfoot>
+</table>
+
+<script type="text/javascript">
+var logarea = document.getElementById("logarea");
+function log(text)
+{
+    logarea.innerHTML = text;
+}
+
+var table = document.getElementById("table1");
+RowSorter(table, {
+    handler: 'td.sorter',
+    stickFirstRow : true,
+    stickLastRow  : false,
+    onDragStart: function(tbody, row, index)
+    {
+        log('onDragStart: ' + index);
+    },
+    onDrop: function(tbody, row, new_index, old_index)
+    {
+        log('sorted from ' + old_index + ' to ' + new_index);
+    }
+});
+
+function killRowSorter()
+{
+    RowSorter(table, false);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>new rowsorter.js</title>
+    <script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../dist/RowSorter.js"></script>
+</head>
+<body>
+
+<style>
+table {width: 400px; font-size: 14px; font-family: tahoma, arial, sans-serif;}
+table thead th {background-color: #ccc; padding: 5px 8px;}
+table td {background-color: #ddd; padding: 5px 8px;}
+
+table.sorting-table {cursor: move;}
+table tr.sorting-row td {background-color: #8b8;}
+</style>
+
+<table id="table1">
+    <thead>
+        <tr>
+            <th colspan="3">Basic Sorting</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Row 1</td>
+            <td>Sample Content 1</td>
+            <td>Sample Content 1</td>
+        </tr>
+        <tr>
+            <td>Row 2</td>
+            <td>Sample Content 2</td>
+            <td>Sample Content 2</td>
+        </tr>
+        <tr>
+            <td>Row 3</td>
+            <td>Sample Content 3</td>
+            <td>Sample Content 3</td>
+        </tr>
+        <tr>
+            <td>Row 4</td>
+            <td>Sample Content 4</td>
+            <td>Sample Content 4</td>
+        </tr>
+        <tr>
+            <td>Row 5</td>
+            <td>Sample Content 5</td>
+            <td>Sample Content 5</td>
+        </tr>
+        <tr>
+            <td>Row 6</td>
+            <td>Sample Content 6</td>
+            <td>Sample Content 6</td>
+        </tr>
+        <tr>
+            <td>Row 7</td>
+            <td>Sample Content 7</td>
+            <td>Sample Content 7</td>
+        </tr>
+        <tr>
+            <td>Row 8</td>
+            <td>Sample Content 8</td>
+            <td>Sample Content 8</td>
+        </tr>
+        <tr>
+            <td>Row 9</td>
+            <td>Sample Content 9</td>
+            <td>Sample Content 9</td>
+        </tr>
+        <tr>
+            <td>Row 10</td>
+            <td>Sample Content 10</td>
+            <td>Sample Content 10</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" id="logarea">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="3"><button type="button" onclick="killRowSorter();">Kill RowSorter</button></td>
+        </tr>
+    </tfoot>
+</table>
+
+<script type="text/javascript">
+var logarea = document.getElementById("logarea");
+function log(text)
+{
+    logarea.innerHTML = text;
+}
+
+var table = document.getElementById("");
+$('#table1').rowSorter({
+    onDragStart: function(tbody, row, index)
+    {
+        //log('index: ' + index);
+        log('onDragStart: active row\'s index is ' + index);
+    },
+    onDrop: function(tbody, row, new_index, old_index)
+    {
+        //log('old_index: ' + old_index + ', new_index: ' + new_index);
+        log('onDrop: row moved from ' + old_index + ' to ' + new_index);
+    }
+});
+
+function killRowSorter()
+{
+    RowSorter(table, false);
+}
+</script>
+
+</body>
+</html>
