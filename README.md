@@ -1,7 +1,7 @@
 RowSorter.js
 ============
 ## Drag & drop row sorter plugin.
-* Small size: 2kb (minified).
+* Small size: ~5kb minified.
 * Works on Touch devices.
 * Supports IE8+ (not tested with ie7) and all other modern browsers.
 * No framework dependency (But registers itself as a jquery plugin if exists.)
