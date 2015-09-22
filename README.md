@@ -50,15 +50,16 @@ RowSorter.js
 * [Basic Usage][basic]
 * [Custom Handler 1][handler1]
 * [Custom Handler 2][handler2]
+* [Sticky Top & Bottom][sticky]
 * [jQuery Plugin][jquery]
 * [Custom CSS][style]
 * [Big Table][bigtable]
 * [Mobile Sample][touchtest]
 
-
 [basic]: http://borayazilim.com/projects/rowsorter/examples/basic.html
 [handler1]: http://borayazilim.com/projects/rowsorter/examples/handler1.html
 [handler2]: http://borayazilim.com/projects/rowsorter/examples/handler2.html
+[sticky]: http://borayazilim.com/projects/rowsorter/examples/sticky.html
 [jquery]: http://borayazilim.com/projects/rowsorter/examples/jquery.html
 [style]: http://borayazilim.com/projects/rowsorter/examples/style.html
 [bigtable]: http://borayazilim.com/projects/rowsorter/examples/big_table.php
