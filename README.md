@@ -11,21 +11,40 @@ RowSorter.js
 <script type="text/javascript" src="/path/dist/RowSorter.js"></script>
 ```
 
+### Usage
+```javascript
+<script type="text/javascript">
+//// No Framework
+// Set table as sortable
+new RowSorter('#table_id'/*, options*/);
+// Destroy sortable
+RowSorter.destroy('#table_id');
+
+//// jQuery
+// Set table as sortable
+$('#table_id').rowSorter(/*options*/);
+// Destroy sortable
+$.rowSorter.destroy('#table_id');
+</script>
+```
+
 ### Options:
 
-    handler         : _string_ drag handler selector (default: null)
-    tbody           : _boolean_ pass true if want to sort only tbody > tr. (default: true)
-    tableClass      : _string_ adds this class name to table while rows are sorting (default: "sorting-table")
-    dragClass       : _string_ dragging row's class name (default: "sorting-row").
-    stickTopRows    : _number_ count of top sticky rows (default: 0),
-    stickBottomRows : _number_ count of bottom sticky rows (default: 0),
-    onDragStart     : _function_ (default: null)
-    onDrop          : _function_ (default: null)
+    @string   handler         : drag handler selector (default: null)
+    @boolean  tbody           : pass true if want to sort only tbody > tr. (default: true)
+    @string   tableClass      : adds this class name to table while rows are sorting (default: "sorting-table")
+    @string   dragClass       : dragging row's class name (default: "sorting-row").
+    @number   stickTopRows    : count of top sticky rows (default: 0),
+    @number   stickBottomRows : count of bottom sticky rows (default: 0),
+    @function onDragStart     : (default: null)
+    @function onDrop          : (default: null)
 
-#### Using Event Handlers
+#### Handling Events
 ```javascript
     onDragStart: function(tbody, row, old_index) {
-        // finding the table
+        // find the table
+        // if options.tbody is true, this param will be tbody element
+        // otherwise it will be table element
         var table = tbody.tagName === "TBODY" ? tbody.parentNode : tbody;
 
         // old_index is zero-based index of row in tbody (or table if tbody not exists)
@@ -34,7 +53,9 @@ RowSorter.js
 
     // if new_index === old_index, this function won't be called.
     onDrop: function(tbody, row, new_index, old_index) {
-        // finding the table
+        // find the table
+        // if options.tbody is true, this param will be tbody element
+        // otherwise it will be table element
         var table = tbody.tagName === "TBODY" ? tbody.parentNode : tbody;
 
         // old_index is stored index of row in table/tbody before start the dragging.
@@ -43,7 +64,7 @@ RowSorter.js
     }
 ```
 
-### Sample Usages
+### Samples
 
 * [Basic Usage][basic]
 * [Custom Handler 1][handler1]
@@ -56,8 +77,8 @@ RowSorter.js
 
 ### File Sizes
 
-Minified: ~7kb
-Minified and gzipped: < 3kb
+* Minified: ~7kb
+* Minified and gzipped: < 3kb
 
 [basic]: http://borayazilim.com/projects/rowsorter/examples/basic.html
 [handler1]: http://borayazilim.com/projects/rowsorter/examples/handler1.html
