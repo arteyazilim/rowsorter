@@ -677,9 +677,11 @@
     if ($) {
         $.fn.extend({
             rowSorter: function(options) {
+                var sorters = [];
                 this.each(function(index, element) {
-                    new RowSorter(element, options);
+                    sorters.push(new RowSorter(element, options));
                 });
+                return sorters.length === 1 ? sorters[0] : sorters;
             }
         });
         $.rowSorter = {destroy: RowSorter.destroy};

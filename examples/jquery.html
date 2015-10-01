@@ -80,7 +80,7 @@ table tr.sorting-row td {background-color: #8b8;}
             <td colspan="3" id="logarea">&nbsp;</td>
         </tr>
         <tr>
-            <td colspan="3"><button type="button" onclick="$.rowSorter.destroy('#table1');">Destroy RowSorter</button></td>
+            <td colspan="3"><button type="button" onclick="$.rowSorter.destroy('#table1');">Destroy way 1</button> <button type="button" onclick="destroyRowSorter();">Destroy way 2</button></td>
         </tr>
     </tfoot>
 </table>
@@ -92,7 +92,7 @@ function log(text)
     logarea.innerHTML = text;
 }
 
-$('#table1').rowSorter({
+var sorter = $('#table1').rowSorter({
     onDragStart: function(tbody, row, index)
     {
         //log('index: ' + index);
@@ -104,6 +104,12 @@ $('#table1').rowSorter({
         log('onDrop: row moved from ' + old_index + ' to ' + new_index);
     }
 });
+
+function destroyRowSorter()
+{
+    sorter.destroy();
+}
+
 </script>
 
 </body>
