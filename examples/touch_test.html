@@ -2,16 +2,17 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>new rowsorter.js</title>
     <script type="text/javascript" src="../dist/RowSorter.js"></script>
 </head>
 <body>
 
 <style>
-table {height: 100%; width: 100%; font-size: 200%; font-family: tahoma, arial, sans-serif;}
-table thead th {background-color: #ccc; padding: 20px 30px;}
-table td {background-color: #ddd; padding: 20px 30px;}
-table button {font-size: 100%; padding: 20px 30px;}
+table {width: 100%; height: 100%; font-size: 80%; font-family: tahoma, arial, sans-serif;}
+table thead th {background-color: #ccc; padding: 5px;}
+table td {background-color: #ddd; padding: 5px;}
+table button {font-size: 80%; padding: 5px 10px;}
 
 table.sorting-table {cursor: move;}
 table tr.sorting-row td {background-color: #8b8;}
@@ -26,89 +27,58 @@ table tr.sorting-row td {background-color: #8b8;}
     <tbody>
         <tr>
             <td>Row 1</td>
-            <td>Sample Content 1</td>
+            <td>Sample Content 1 <button type="button" onclick="alert('working');">Click</button></td>
             <td>Sample Content 1</td>
         </tr>
         <tr>
             <td>Row 2</td>
-            <td>Sample Content 2</td>
+            <td>Sample Content 2 <button type="button" onclick="alert('working');">Click</button></td>
             <td>Sample Content 2</td>
         </tr>
         <tr>
             <td>Row 3</td>
-            <td>Sample Content 3</td>
+            <td>Sample Content 3 <button type="button" onclick="alert('working');">Click</button></td>
             <td>Sample Content 3</td>
         </tr>
         <tr>
             <td>Row 4</td>
-            <td>Sample Content 4</td>
+            <td>Sample Content 4 <button type="button" onclick="alert('working');">Click</button></td>
             <td>Sample Content 4</td>
         </tr>
         <tr>
             <td>Row 5</td>
-            <td>Sample Content 5</td>
+            <td>Sample Content 5 <button type="button" onclick="alert('working');">Click</button></td>
             <td>Sample Content 5</td>
         </tr>
         <tr>
             <td>Row 6</td>
-            <td>Sample Content 6</td>
+            <td>Sample Content 6 <button type="button" onclick="alert('working');">Click</button></td>
             <td>Sample Content 6</td>
         </tr>
         <tr>
             <td>Row 7</td>
+            <td>Sample Content 7 <button type="button" onclick="alert('working');">Click</button></td>
             <td>Sample Content 7</td>
-            <td>Sample Content 7</td>
-        </tr>
-        <tr>
-            <td>Row 8</td>
-            <td>Sample Content 8</td>
-            <td>Sample Content 8</td>
-        </tr>
-        <tr>
-            <td>Row 9</td>
-            <td>Sample Content 9</td>
-            <td>Sample Content 9</td>
-        </tr>
-        <tr>
-            <td>Row 10</td>
-            <td>Sample Content 10</td>
-            <td>Sample Content 10</td>
         </tr>
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="3" id="logarea">&nbsp;</td>
-        </tr>
-        <tr>
-            <td colspan="3"><button type="button" onclick="killRowSorter();">Kill RowSorter</button></td>
+            <td colspan="3"><button type="button" onclick="destroyRowSorter();">Destroy RowSorter</button></td>
         </tr>
     </tfoot>
 </table>
 
 <script type="text/javascript">
-var logarea = document.getElementById("logarea");
-function log(text)
-{
-    logarea.innerHTML = text;
-}
 
 var table = document.getElementById("table1");
-RowSorter(table, {
-    stickFirstRow : false,
-    stickLastRow  : true,
-    onDragStart: function(tbody, row, index)
-    {
-        log('onDragStart: ' + index);
-    },
-    onDrop: function(tbody, row, new_index, old_index)
-    {
-        log('sorted from ' + old_index + ' to ' + new_index);
-    }
+/*var sorterObj = */RowSorter(table, {
+    handler: 'td'
 });
 
-function killRowSorter()
+function destroyRowSorter()
 {
-    RowSorter(table, false);
+    RowSorter.destroy(table);
+    //sorterObj.destroy();
 }
 </script>
 

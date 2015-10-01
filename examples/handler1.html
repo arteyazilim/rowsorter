@@ -17,7 +17,7 @@ table tr.sorting-row td {background-color: #8b8;}
 table td.sorter {background-color: #f80; width: 10px; cursor: move;}
 </style>
 
-<table id="table1">
+<table attr-sample="thetable">
     <thead>
         <tr>
             <th colspan="4">Basic Sorting</th>
@@ -60,7 +60,7 @@ table td.sorter {background-color: #f80; width: 10px; cursor: move;}
             <td colspan="4" id="logarea">&nbsp;</td>
         </tr>
         <tr>
-            <td colspan="4"><button type="button" onclick="killRowSorter();">Kill RowSorter</button></td>
+            <td colspan="4"><button type="button" onclick="RowSorter.destroy('table[attr-sample=thetable]');">Destroy RowSorter</button></td>
         </tr>
     </tfoot>
 </table>
@@ -73,24 +73,19 @@ function log(text)
 }
 
 var table = document.getElementById("table1");
-RowSorter(table, {
+RowSorter('table[attr-sample=thetable]', {
     handler: 'td.sorter',
     stickFirstRow : true,
     stickLastRow  : false,
     onDragStart: function(tbody, row, index)
     {
-        log('onDragStart: ' + index);
+        log('start index is ' + index);
     },
     onDrop: function(tbody, row, new_index, old_index)
     {
         log('sorted from ' + old_index + ' to ' + new_index);
     }
 });
-
-function killRowSorter()
-{
-    RowSorter(table, false);
-}
 </script>
 
 </body>

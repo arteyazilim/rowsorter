@@ -21,10 +21,39 @@
         };
     }
 
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
+    if (!Function.prototype.bind) {
+        Function.prototype.bind = function(oThis)
+        {
+            if (typeof this !== 'function') {
+                // closest thing possible to the ECMAScript 5
+                // internal IsCallable function
+                throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+            }
+
+            var aArgs   = Array.prototype.slice.call(arguments, 1),
+                fToBind = this,
+                fNOP    = function() {},
+                fBound  = function() {
+                    return fToBind.apply(
+                        this instanceof fNOP ? this : oThis,
+                        aArgs.concat(Array.prototype.slice.call(arguments))
+                    );
+                };
+
+            if (this.prototype) {
+                // native functions don't have a prototype
+                fNOP.prototype = this.prototype;
+            }
+
+            fBound.prototype = new fNOP();
+            return fBound;
+        };
+    }
+
     var $ = window.jQuery||false,
-        isTouchDevice = !!('ontouchstart' in document),
+        touchSupport = !!('ontouchstart' in document),
         helperAttrName = 'data-rowsorter',
-        dragging = false,
         defaults = {
             handler         : null,
             tbody           : true,
@@ -36,177 +65,99 @@
             onDrop          : null
         };
 
-    // if document has onselectstart event (old-ie)
-    if ('onselectstart' in document) {
-        document.onselectstart = function() {
-            // if dragging status is true
-            if (dragging) {
-                // prevent default
-                return false;
-            }
-        };
-    }
-
     function RowSorter(table, opts)
     {
-        var helper;
+        if (!(this instanceof RowSorter)) {
+            return new RowSorter(table, opts);
+        }
 
-        // if opts is false
-        if (opts === false) {
-            if (table[ helperAttrName ]) {
-                if (typeof table[ helperAttrName ] === 'object') {
-
-                    // get the helper.
-                    helper = table[ helperAttrName ];
-
-                    // detach events
-                    if (helper.events && typeof helper.events === 'object') {
-                        helper.events.mousedown && removeEvent(table, 'mousedown', helper.events.mousedown);
-                        helper.events.touchstart && removeEvent(table, 'touchstart', helper.events.touchstart);
-                    }
-                }
-                delete table[ helperAttrName ];
+        if (typeof table === 'string') {
+            table = findTable(table);
+            if (table === null) {
+                throw new Error('Table not found.');
             }
-            return;
         }
 
-        // if row sorter attached previously
-        if (table[ helperAttrName ]) {
-            //RowSorter(table, false);
-            return;
+        if (!(helperAttrName in table) || !(table[ helperAttrName ] instanceof RowSorter)) {
+            this._options = extend(defaults, opts);
+            this._table = table;
+            this._tbody = table;
+            this._rows = [];
+            this._lastY = false;
+            this._draggingRow = null;
+            this._firstTouch = true;
+
+            this._b_mousedown = this._mousedown.bind(this);
+            this._b_mousemove = this._mousemove.bind(this);
+            this._b_mouseup = this._mouseup.bind(this);
+
+            this._b_touchstart = this._touchstart.bind(this);
+            this._b_touchmove = this._touchmove.bind(this);
+            this._b_touchend = this._touchend.bind(this);
+            this._touchId = null;
+
+            this._table[ helperAttrName ] = this;
+            this.init();
         }
+    }
 
-        // helper for storing event.
-        helper = {events: {}};
-
-        // store helper object.
-        table[ helperAttrName ] = helper;
-
-        // extend default options
-        var options = extend(defaults, opts),
-            tbody = table, rows,
-            draggingRow = null,
-            lastY, old_index = 0;
-
-        if (options.tbody) {
-            var bodies = table.getElementsByTagName('TBODY');
+    RowSorter.prototype.init = function()
+    {
+        if (this._options.tbody) {
+            var bodies = this._table.getElementsByTagName('tbody');
             if (bodies.length > 0) {
-                tbody = bodies[0];
+                this._tbody = bodies[0];
             }
-        }
-
-        // attach mousedown event
-        addEvent(table, 'mousedown', onStart);
-        helper.events.mousedown = onStart;
-        if (isTouchDevice) {
-            addEvent(table, 'touchstart', onStart);
-            helper.events.touchstart = onStart;
         }
 
         // pre-check handlers
-        if (typeof options.onDragStart !== 'function') {
-            options.onDragStart = null;
+        if (typeof this._options.onDragStart !== 'function') {
+            this._options.onDragStart = null;
         }
 
-        if (typeof options.onDrop !== 'function') {
-            options.onDrop = null;
+        if (typeof this._options.onDrop !== 'function') {
+            this._options.onDrop = null;
         }
 
-        if (typeof options.stickTopRows !== 'number' || options.stickTopRows < 0) {
-            options.stickTopRows = 0;
+        if (typeof this._options.stickTopRows !== 'number' || this._options.stickTopRows < 0) {
+            this._options.stickTopRows = 0;
         }
 
-        if (typeof options.stickBottomRows !== 'number' || options.stickBottomRows < 0) {
-            options.stickBottomRows = 0;
+        if (typeof this._options.stickBottomRows !== 'number' || this._options.stickBottomRows < 0) {
+            this._options.stickBottomRows = 0;
         }
 
-        function onStart(e)
-        {
-            // handle event for old-ie
-            var ev = e||window.event;
+        addEvent(this._table, 'mousedown', this._b_mousedown);
+        addEvent(document, 'mouseup', this._b_mouseup);
 
-            rows = tbody.rows;
-            if (rows.length < 2) {
-                return true;
-            }
+        if (touchSupport) {
+            addEvent(this._table, 'touchstart', this._b_touchstart);
+            addEvent(this._table, 'touchend', this._b_touchend);
+        }
 
-            var target, clientY;
-            if (ev.touches) {
-                if (ev.touches.length === 0) {
-                    return true;
+        // if document has onselectstart event (old-ie)
+        if ('onselectstart' in document) {
+            var that = this;
+            addEvent(document, 'selectstart', function(e) {
+                var ev = e||window.event;
+                // if dragging status is true
+                if (that._draggingRow !== null) {
+                    // prevent default
+                    if (ev.preventDefault) {
+                        ev.preventDefault();
+                    } else {
+                        ev.returnValue = false;
+                    }
+                    return false;
                 }
-                var touch = ev.touches[0];
-                target = document.elementFromPoint(touch.clientX, touch.clientY);
-                clientY = touch.clientY;
-                if (!target) {
-                    return true;
-                }
-            } else {
-                target = ev.target||ev.srcElement;
-                clientY = ev.clientY;
-            }
+            });
+        }
+    };
 
-            // if handler options is specified
-            if (options.handler) {
-                // find the handlers
-                var handlers = qsa(table, options.handler);
-                // check targeted element in handlers
-                if (inArray(target, handlers) === false) {
-                    return true;
-                }
-            }
-
-            // find the closest row element.
-            draggingRow = closest(target, 'tr');
-
-            // find current index
-            var current_index = rowIndex(tbody, draggingRow);
-
-            if (
-                // if not found any tr element
-                draggingRow === null ||
-                // if active row is not valid
-                inArray(draggingRow, rows) === false ||
-                // if stickTopRows > 0 and active row is in top sticky rows
-                (options.stickTopRows > 0 && current_index < options.stickTopRows) ||
-                // if stickBottomRows > 0 and active row is in bottom sticky rows
-                (options.stickBottomRows > 0 && current_index >= rows.length - options.stickBottomRows)
-            ) {
-                draggingRow = null;
-                return true;
-            }
-
-            // add tableClass to table
-            if (options.tableClass) {
-                addClass(table, options.tableClass);
-            }
-
-            // add dragClass to active row
-            if (options.dragClass) {
-                addClass(draggingRow, options.dragClass);
-            }
-
-            // store current index as old index
-            old_index = current_index;
-
-            // call onDragStart
-            if (options.onDragStart) {
-                options.onDragStart(tbody, draggingRow, old_index);
-            }
-
-            // store last mouse position
-            lastY = clientY;
-
-            // attach events
-            addEvent(table, 'mousemove', onMove);
-            addEvent(document, 'mouseup', onEnd);
-
-            // attach touch move event
-            if (isTouchDevice) {
-                addEvent(document, 'touchend', onEnd);
-                addEvent(table, 'touchmove', onMove);
-            }
-
+    RowSorter.prototype._mousedown = function(e)
+    {
+        var ev = e || window.event;
+        if (this._start(ev.target || ev.srcElement, ev.clientY)) {
             if (ev.preventDefault) {
                 ev.preventDefault();
             } else {
@@ -214,111 +165,260 @@
             }
             return false;
         }
+        return true;
+    };
 
-        function onMove(e)
-        {
-            // handle event for old-ie
-            var ev = e||window.event;
-
-            // if there is not a draggingRow, kill the event.
-            if (!draggingRow) {
-                return true;
-            }
-
-            var target, clientY;
-            if (ev.touches) {
-                if (ev.touches.length === 0) {
-                    return true;
-                }
-                var touch = ev.touches[0];
+    RowSorter.prototype._touchstart = function(ev)
+    {
+        if (ev.touches.length === 1) {
+            var touch = ev.touches[0],
                 target = document.elementFromPoint(touch.clientX, touch.clientY);
-                clientY = touch.clientY;
-                if (!target) {
-                    return true;
+
+            this._touchId = touch.identifier;
+            if (this._start(target, touch.clientY)) {
+                if (ev.preventDefault) {
+                    ev.preventDefault();
+                } else {
+                    ev.returnValue = false;
                 }
-            } else {
-                target = ev.target||ev.srcElement;
-                clientY = ev.clientY;
+                return false;
             }
+        }
+        return true;
+    };
 
-            // store dragging status as true
-            dragging = true;
+    RowSorter.prototype._start = function(target, clientY)
+    {
+        if (this._draggingRow) {
+            this._end();
+        }
 
-            // find direction by last stored position
-            var direction = clientY > lastY ? 1 : (clientY < lastY ? -1 : 0);
+        // read rows
+        this._rows = this._tbody.rows;
+        if (this._rows.length < 2) {
+            return false;
+        }
 
-            // if direction is not zero (when first mouse-drag, this can be zero)
-            if (direction !== 0) {
+        // if handler options is specified
+        if (this._options.handler) {
+            // find the handlers
+            var handlers = qsa(this._table, this._options.handler);
+            // check targeted element in handlers
+            if (!handlers || inArray(target, handlers) === -1) {
+                return false;
+            }
+        }
 
-                // search the hovered row
-                var hoveredRow = closest(target, 'tr');
+        // find the closest row element.
+        var draggingRow = closest(target, 'tr');
 
-                // if found any row
-                // and hovered row is not the dragging row
-                // and the hovered row is valid
-                if (hoveredRow && hoveredRow !== draggingRow && inArray(hoveredRow, rows)) {
+        // find current index
+        var current_index = rowIndex(this._tbody, draggingRow);
 
-                    var move = true;
-                    if (options.stickTopRows > 0 || options.stickBottomRows > 0) {
-                        // find new position
-                        var new_index = rowIndex(tbody, hoveredRow);
+        if (
+            // if not found any tr element or not valid
+            current_index === -1 ||
+            // if stickTopRows > 0 and active row is in top sticky rows
+            (this._options.stickTopRows > 0 && current_index < this._options.stickTopRows) ||
+            // if stickBottomRows > 0 and active row is in bottom sticky rows
+            (this._options.stickBottomRows > 0 && current_index >= this._rows.length - this._options.stickBottomRows)
+        ) {
+            return false;
+        }
 
-                        if (
-                            (options.stickTopRows > 0 && new_index < options.stickTopRows) ||
-                            (options.stickBottomRows > 0 && new_index >= rows.length - options.stickBottomRows)
-                        ) {
-                            move = false;
-                        }
+        this._draggingRow = draggingRow;
+
+        // add tableClass to table
+        if (this._options.tableClass) {
+            addClass(this._table, this._options.tableClass);
+        }
+
+        // add dragClass to active row
+        if (this._options.dragClass) {
+            addClass(this._draggingRow, this._options.dragClass);
+        }
+
+        // store current index as old index
+        this._oldIndex = current_index;
+
+        // call onDragStart
+        if (this._options.onDragStart) {
+            this._options.onDragStart(this._tbody, this._draggingRow, this._oldIndex);
+        }
+
+        // store last mouse position
+        this._lastY = clientY;
+
+        // attach events
+        addEvent(this._table, 'mousemove', this._b_mousemove);
+
+        if (touchSupport) {
+            addEvent(this._table, 'touchmove', this._b_touchmove);
+        }
+
+        return true;
+    };
+
+    RowSorter.prototype._mousemove = function(e)
+    {
+        var ev = e || window.event;
+        this._move(ev.target || ev.srcElement, ev.clientY);
+        return true;
+    };
+
+    RowSorter.prototype._touchmove = function(ev)
+    {
+        if (ev.touches.length === 1) {
+            var touch = ev.touches[0],
+                target = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            if (this._touchId === touch.identifier) {
+                this._move(target, touch.clientY);
+            }
+        }
+        return true;
+    };
+
+    RowSorter.prototype._move = function(target, clientY)
+    {
+        // if there is not a draggingRow, kill the event.
+        if (!this._draggingRow) {
+            return;
+        }
+
+        // find direction by last stored position
+        var direction = clientY > this._lastY ? 1 : (clientY < this._lastY ? -1 : 0);
+
+        // if direction is not zero (when first mouse-drag, it can be zero)
+        if (direction !== 0) {
+
+            // search the hovered row
+            var hoveredRow = closest(target, 'tr');
+
+            // if found any row
+            // and hovered row is not the dragging row
+            // and the hovered row is valid
+            if (hoveredRow && hoveredRow !== this._draggingRow && inArray(hoveredRow, this._rows) !== -1) {
+
+                var move = true;
+                if (this._options.stickTopRows > 0 || this._options.stickBottomRows > 0) {
+                    // find new position
+                    var new_index = rowIndex(this._tbody, hoveredRow);
+
+                    if (
+                        (this._options.stickTopRows > 0 && new_index < this._options.stickTopRows) ||
+                        (this._options.stickBottomRows > 0 && new_index >= this._rows.length - this._options.stickBottomRows)
+                    ) {
+                        move = false;
                     }
-
-                    // move row
-                    move && moveRow(draggingRow, hoveredRow, direction);
-
-                    // store last mouse position
-                    lastY = clientY;
                 }
+
+                // move row
+                move && moveRow(this._draggingRow, hoveredRow, direction);
+
+                // store last mouse position
+                this._lastY = clientY;
             }
         }
+    };
 
-        function onEnd(e)
-        {
-            // store dragging status as true
-            dragging = false;
+    RowSorter.prototype._mouseup = function(ev)
+    {
+        this._end();
+    };
 
-            // if there is not a draggingRow, kill the event.
-            if (!draggingRow) {
-                return true;
-            }
-
-            // remove table class
-            if (options.tableClass) {
-                removeClass(table, options.tableClass);
-            }
-
-            // remove draggingRow class
-            if (options.dragClass) {
-                removeClass(draggingRow, options.dragClass);
-            }
-
-            // find the dragging row's new index
-            var new_index = rowIndex(tbody, draggingRow);
-
-            // if new index is not the old index
-            if (options.onDrop && new_index !== old_index) {
-                options.onDrop(tbody, draggingRow, new_index, old_index);
-            }
-
-            // remove stored active row
-            draggingRow = null;
-
-            // detach events
-            removeEvent(table, 'mousemove', onMove);
-            removeEvent(document, 'mouseup', onEnd);
-            if (isTouchDevice) {
-                removeEvent(table, 'touchmove', onMove);
-                removeEvent(document, 'touchend', onEnd);
-            }
+    RowSorter.prototype._touchend = function(ev)
+    {
+        if (ev.changedTouches.length > 0 && this._touchId === ev.changedTouches[0].identifier) {
+            this._end();
         }
+    };
+
+    RowSorter.prototype._end = function()
+    {
+        // if there is not a draggingRow, kill the event.
+        if (!this._draggingRow) {
+            return true;
+        }
+
+        // remove table class
+        if (this._options.tableClass) {
+            removeClass(this._table, this._options.tableClass);
+        }
+
+        // remove draggingRow class
+        if (this._options.dragClass) {
+            removeClass(this._draggingRow, this._options.dragClass);
+        }
+
+        // find the dragging row's new index
+        var new_index = rowIndex(this._tbody, this._draggingRow);
+
+        // if new index is not the old index
+        if (this._options.onDrop && new_index !== this._oldIndex) {
+            this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
+        }
+
+        // remove stored active row
+        this._draggingRow = null;
+        this._lastY = false;
+        this._touchId = null;
+
+        // attach events
+        removeEvent(this._table, 'mousemove', this._b_mousemove);
+
+        if (touchSupport) {
+            removeEvent(this._table, 'touchmove', this._b_touchmove);
+        }
+    };
+
+    RowSorter.prototype.destroy = function()
+    {
+        this._table[ helperAttrName ] = null;
+
+        removeEvent(this._table, 'mousedown', this._b_mousedown);
+        removeEvent(document, 'mouseup', this._b_mouseup);
+
+        if (touchSupport) {
+            removeEvent(this._table, 'touchstart', this._b_touchstart);
+            removeEvent(this._table, 'touchend', this._b_touchend);
+        }
+    };
+
+    // not necessary
+    /*
+    RowSorter.get = function(table)
+    {
+        if (helperAttrName in table && table[ helperAttrName ] instanceof RowSorter) {
+            return table[ helperAttrName ];
+        }
+        return null;
+    };*/
+
+    RowSorter.destroy = function(table)
+    {
+        if (typeof table === 'string') {
+            table = findTable(table);
+        }
+
+        if (table !== null && helperAttrName in table && table[ helperAttrName ] instanceof RowSorter) {
+            table[ helperAttrName ].destroy();
+        }
+    };
+
+    /**
+     * Searchs table by specified query.
+     *
+     * @param  {string}     query
+     * @return {mixed|null}
+     */
+    function findTable(query)
+    {
+        var elements = qsa(document, query);
+        if (elements.length > 0 && 'nodeName' in elements[0] && elements[0].nodeName === 'TABLE') {
+            return elements[0];
+        }
+        return null;
     }
 
     /**
@@ -362,34 +462,36 @@
     }
 
     /**
-     * Adds a new event handler.
+     * Attachs an event to an element.
+     *
+     * @source http://ejohn.org/projects/flexible-javascript-events/
      *
      * @param {Element}  element
-     * @param {string}   name
+     * @param {string}   type
      * @param {Function} fn
      */
-    function addEvent(element, name, fn)
+    function addEvent(obj, type, fn)
     {
-        if (element.addEventListener) {
-            element.addEventListener(name, fn, true);
-        } else if(element.attachEvent) {
-            element.attachEvent('on' + name, fn);
+        if (obj.attachEvent) {
+            obj.attachEvent('on' + type, fn);
+        } else {
+            obj.addEventListener(type, fn, false);
         }
     }
 
     /**
-     * Removes an event handler.
+     * Detachs an event from an element.
      *
      * @param {Element}  element
-     * @param {string}   name
+     * @param {string}   type
      * @param {Function} fn
      */
-    function removeEvent(element, name, fn)
+    function removeEvent(obj, type, fn)
     {
-        if (element.removeEventListener) {
-            element.removeEventListener(name, fn, true);
-        } else if(element.detachEvent) {
-            element.detachEvent('on' + name, fn);
+        if (obj.detachEvent) {
+            obj.detachEvent('on' + type, fn);
+        } else {
+            obj.removeEventListener(type, fn, false);
         }
     }
 
@@ -434,6 +536,10 @@
     function addClass(element, cls)
     {
         cls = cls.trim();
+        if (cls === '') {
+            return;
+        }
+
         if (cls.indexOf(' ') !== -1) {
             var classes = cls.split(' '),
                 i = 0, len = classes.length;
@@ -461,6 +567,10 @@
     function removeClass(element, cls)
     {
         cls = cls.trim();
+        if (cls === '') {
+            return;
+        }
+
         if (cls.indexOf(' ') !== -1) {
             var classes = cls.split(' '),
                 i = 0, len = classes.length;
@@ -500,7 +610,7 @@
             }
         }
 
-        if ('[object Object]' === Object.prototype.toString.call(from)) {
+        if (from && '[object Object]' === Object.prototype.toString.call(from)) {
             for (key in from) {
                 if (from.hasOwnProperty(key)) {
                     obj[ key ] = from[ key ];
@@ -534,14 +644,14 @@
      */
     function closest(element, tag)
     {
-        var i = 0, max = 100, found = element;
+        var i = 0, max = 20, found = element;
         tag = tag.toLowerCase();
         while (found.tagName && found.tagName.toLowerCase() !== tag) {
-            found = found.parentNode;
-            i++;
-            if (i > max) {
+            if (i > max || !found.parentNode) {
                 return null;
             }
+            found = found.parentNode;
+            i++;
         }
         return found;
     }
@@ -557,10 +667,10 @@
     {
         for (var i = 0, len = arr.length; i < len; i++) {
             if (search === arr[ i ]) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
     // if jQuery, register plugin.
@@ -568,10 +678,11 @@
         $.fn.extend({
             rowSorter: function(options) {
                 this.each(function(index, element) {
-                    RowSorter(element, options);
+                    new RowSorter(element, options);
                 });
             }
         });
+        $.rowSorter = {destroy: RowSorter.destroy};
     }
 
     return RowSorter;

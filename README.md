@@ -1,28 +1,26 @@
 RowSorter.js
 ============
 ## Drag & drop row sorter plugin.
-* Small size: ~5kb minified.
 * Works on Touch devices.
-* Supports IE8+ (not tested with ie7) and all other modern browsers.
+* Supports IE8+ and all other modern browsers.
 * No framework dependency (But registers itself as a jquery plugin if exists.)
 
 ### Install
     bower install rowsorter
-### Manuel Install
 ```html
 <script type="text/javascript" src="/path/dist/RowSorter.js"></script>
 ```
 
 ### Options:
 
-    handler         : drag handler selector (default: null)
-    tbody           : pass true if want to sort only tbody > tr. (default: true)
-    tableClass      : adds this class name to table while rows are sorting (default: "sorting-table")
-    dragClass       : dragging row's class name (default: "sorting-row").
-    stickTopRows    : count of top sticky rows (default: 0),
-    stickBottomRows : count of bottom sticky rows (default: 0),
-    onDragStart     : (default: null)
-    onDrop          : (default: null)
+    handler         : _string_ drag handler selector (default: null)
+    tbody           : _boolean_ pass true if want to sort only tbody > tr. (default: true)
+    tableClass      : _string_ adds this class name to table while rows are sorting (default: "sorting-table")
+    dragClass       : _string_ dragging row's class name (default: "sorting-row").
+    stickTopRows    : _number_ count of top sticky rows (default: 0),
+    stickBottomRows : _number_ count of bottom sticky rows (default: 0),
+    onDragStart     : _function_ (default: null)
+    onDrop          : _function_ (default: null)
 
 #### Using Event Handlers
 ```javascript
@@ -55,6 +53,11 @@ RowSorter.js
 * [Custom CSS][style]
 * [Big Table][bigtable]
 * [Mobile Sample][touchtest]
+
+### File Sizes
+
+Minified: ~7kb
+Minified and gzipped: < 3kb
 
 [basic]: http://borayazilim.com/projects/rowsorter/examples/basic.html
 [handler1]: http://borayazilim.com/projects/rowsorter/examples/handler1.html

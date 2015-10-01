@@ -18,7 +18,7 @@ table td.div {padding: 0;}
 table td.div > div {background-color: #b88;line-height:2;}
 </style>
 
-<table id="table1">
+<table class="sample_table">
     <thead>
         <tr>
             <th colspan="4">Basic Sorting</th>
@@ -38,31 +38,13 @@ table td.div > div {background-color: #b88;line-height:2;}
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="4" id="logarea">&nbsp;</td>
-        </tr>
-        <tr>
-            <td colspan="4"><button type="button" onclick="killRowSorter();">Kill RowSorter</button></td>
+            <td colspan="4"><button type="button" onclick="RowSorter.destroy('.sample_table');">Destroy RowSorter</button></td>
         </tr>
     </tfoot>
 </table>
 
 <script type="text/javascript">
-var logarea = document.getElementById("logarea");
-function log(text)
-{
-    logarea.innerHTML = text;
-}
-
-var table = document.getElementById("table1");
-RowSorter(table, {
-    stickFirstRow : false,
-    stickLastRow  : false
-});
-
-function killRowSorter()
-{
-    RowSorter(table, false);
-}
+RowSorter(".sample_table");
 </script>
 
 </body>

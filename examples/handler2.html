@@ -55,7 +55,7 @@ table tr.sorting-row td {background-color: #8b8;}
             <td colspan="3" id="logarea">&nbsp;</td>
         </tr>
         <tr>
-            <td colspan="3"><button type="button" onclick="killRowSorter();">Kill RowSorter</button></td>
+            <td colspan="3"><button type="button" onclick="RowSorter.destroy('#table1');">Destroy RowSorter</button></td>
         </tr>
     </tfoot>
 </table>
@@ -67,25 +67,19 @@ function log(text)
     logarea.innerHTML = text;
 }
 
-var table = document.getElementById("table1");
-RowSorter(table, {
+RowSorter('#table1', {
     handler: '.sort-handler',
     stickFirstRow : true,
     stickLastRow  : false,
     onDragStart: function(tbody, row, index)
     {
-        log('onDragStart: ' + index);
+        log('start index is ' + index);
     },
     onDrop: function(tbody, row, new_index, old_index)
     {
         log('sorted from ' + old_index + ' to ' + new_index);
     }
 });
-
-function killRowSorter()
-{
-    RowSorter(table, false);
-}
 
 </script>
 

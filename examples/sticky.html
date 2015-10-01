@@ -76,7 +76,7 @@ table tr.sorting-row td {background-color: #8b8;}
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="3"><button type="button" onclick="killRowSorter(document.getElementById('table1'));">Kill RowSorter</button></td>
+            <td colspan="3"><button type="button" onclick="RowSorter.destroy('#table1');">Destroy RowSorter</button></td>
         </tr>
     </tfoot>
 </table>
@@ -141,27 +141,20 @@ table tr.sorting-row td {background-color: #8b8;}
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="3"><button type="button" onclick="killRowSorter(document.getElementById('table2'));">Kill RowSorter</button></td>
+            <td colspan="3"><button type="button" onclick="RowSorter.destroy('#table2');">Destroy RowSorter</button></td>
         </tr>
     </tfoot>
 </table>
 
 <script type="text/javascript">
 
-var table1 = document.getElementById("table1");
-RowSorter(table1, {
+RowSorter("#table1", {
     stickTopRows: 1
 });
 
-var table2 = document.getElementById("table2");
-RowSorter(table2, {
+RowSorter("#table2", {
     stickBottomRows: 1
 });
-
-function killRowSorter(table)
-{
-    RowSorter(table, false);
-}
 </script>
 
 </body>

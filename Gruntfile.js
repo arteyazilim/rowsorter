@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
     grunt.initConfig({
         uglify: {
-            my_target: {
+            target_1: {
                 files: {
                     'dist/RowSorter.js': ['src/RowSorter.js']
                 }
