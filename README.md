@@ -17,12 +17,16 @@ RowSorter.js
 //// No Framework
 // Set table as sortable
 new RowSorter('#table_id'/*, options*/);
+// Revert last drag
+RowSorter.revert('#table_id');
 // Destroy sortable
 RowSorter.destroy('#table_id');
 
-//// jQuery
+//// jQuery Plugin
 // Set table as sortable
 $('#table_id').rowSorter(/*options*/);
+// Revert last drag
+$.rowSorter.revert('#table_id');
 // Destroy sortable
 $.rowSorter.destroy('#table_id');
 </script>
@@ -74,6 +78,7 @@ $.rowSorter.destroy('#table_id');
 * [Custom CSS][style]
 * [Big Table][bigtable]
 * [Mobile Sample][touchtest]
+* [Revert][revert]
 
 ### File Sizes
 
@@ -88,3 +93,4 @@ $.rowSorter.destroy('#table_id');
 [style]: http://borayazilim.com/projects/rowsorter/examples/style.html
 [bigtable]: http://borayazilim.com/projects/rowsorter/examples/big_table.php
 [touchtest]: http://borayazilim.com/projects/rowsorter/examples/touch_test.html
+[revert]: http://borayazilim.com/projects/rowsorter/examples/revert.html

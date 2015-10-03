@@ -1,7 +1,7 @@
 (function(root, factory) {
     'use strict';
     if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
+        // Require.js/AMD
         define('RowSorter', factory);
     } else if (typeof exports === 'object') {
         // Node/CommonJS
@@ -73,32 +73,37 @@
 
         if (typeof table === 'string') {
             table = findTable(table);
-            if (table === null) {
-                throw new Error('Table not found.');
-            }
         }
 
-        if (!(helperAttrName in table) || !(table[ helperAttrName ] instanceof RowSorter)) {
-            this._options = extend(defaults, opts);
-            this._table = table;
-            this._tbody = table;
-            this._rows = [];
-            this._lastY = false;
-            this._draggingRow = null;
-            this._firstTouch = true;
-
-            this._b_mousedown = this._mousedown.bind(this);
-            this._b_mousemove = this._mousemove.bind(this);
-            this._b_mouseup = this._mouseup.bind(this);
-
-            this._b_touchstart = this._touchstart.bind(this);
-            this._b_touchmove = this._touchmove.bind(this);
-            this._b_touchend = this._touchend.bind(this);
-            this._touchId = null;
-
-            this._table[ helperAttrName ] = this;
-            this.init();
+        if (is(table, 'table') === false) {
+            throw new Error('Table not found.');
         }
+
+        if (table[ helperAttrName ] instanceof RowSorter) {
+            return table[ helperAttrName ];
+        }
+
+        this._options = extend(defaults, opts);
+        this._table = table;
+        this._tbody = table;
+        this._rows = [];
+        this._lastY = false;
+        this._draggingRow = null;
+        this._firstTouch = true;
+        this._lastSort = null;
+        this._ended = true;
+
+        this._b_mousedown = this._mousedown.bind(this);
+        this._b_mousemove = this._mousemove.bind(this);
+        this._b_mouseup = this._mouseup.bind(this);
+
+        this._b_touchstart = this._touchstart.bind(this);
+        this._b_touchmove = this._touchmove.bind(this);
+        this._b_touchend = this._touchend.bind(this);
+        this._touchId = null;
+
+        this._table[ helperAttrName ] = this;
+        this.init();
     }
 
     RowSorter.prototype.init = function()
@@ -248,6 +253,7 @@
 
         // store last mouse position
         this._lastY = clientY;
+        this._ended = false;
 
         // attach events
         addEvent(this._table, 'mousemove', this._b_mousemove);
@@ -314,7 +320,9 @@
                 }
 
                 // move row
-                move && moveRow(this._draggingRow, hoveredRow, direction);
+                if (move) {
+                    moveRow(this._draggingRow, hoveredRow, direction);
+                }
 
                 // store last mouse position
                 this._lastY = clientY;
@@ -322,7 +330,7 @@
         }
     };
 
-    RowSorter.prototype._mouseup = function(ev)
+    RowSorter.prototype._mouseup = function()
     {
         this._end();
     };
@@ -355,14 +363,26 @@
         var new_index = rowIndex(this._tbody, this._draggingRow);
 
         // if new index is not the old index
-        if (this._options.onDrop && new_index !== this._oldIndex) {
-            this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
+        if (new_index !== this._oldIndex) {
+            // backup previous sort operation
+            var previous = this._lastSort;
+            // store current sort operation and backup data
+            this._lastSort = {
+                previous: previous,
+                newIndex: new_index,
+                oldIndex: this._oldIndex
+            };
+
+            if (this._options.onDrop) {
+                this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
+            }
         }
 
         // remove stored active row
         this._draggingRow = null;
         this._lastY = false;
         this._touchId = null;
+        this._ended = true;
 
         // attach events
         removeEvent(this._table, 'mousemove', this._b_mousemove);
@@ -372,9 +392,34 @@
         }
     };
 
+    RowSorter.prototype.revert = function()
+    {
+        if (this._lastSort !== null) {
+            var lastSort = this._lastSort,
+                old_index = lastSort.oldIndex,
+                new_index = lastSort.newIndex,
+                rows = this._tbody.rows,
+                max_index = rows.length - 1;
+
+            if (rows.length > 1) {
+                if (old_index < max_index) {
+                    this._tbody.insertBefore(rows[ new_index ], rows[ old_index + (new_index > old_index ? 0 : 1) ]);
+                } else {
+                    this._tbody.appendChild(rows[ new_index ]);
+                }
+            }
+
+            this._lastSort = lastSort.previous;
+        }
+    };
+
     RowSorter.prototype.destroy = function()
     {
         this._table[ helperAttrName ] = null;
+
+        if (this._ended === false) {
+            this._end();
+        }
 
         removeEvent(this._table, 'mousedown', this._b_mousedown);
         removeEvent(document, 'mouseup', this._b_mouseup);
@@ -395,16 +440,53 @@
         return null;
     };*/
 
-    RowSorter.destroy = function(table)
+    RowSorter.revert = function(table, suppressError)
     {
+        var sorter = getSorterObject(table);
+
+        if (sorter === null && suppressError === false) {
+            throw new Error('Table not found.');
+        }
+
+        if (sorter) {
+            sorter.revert();
+        }
+    };
+
+    RowSorter.destroy = function(table, suppressError)
+    {
+        var sorter = getSorterObject(table);
+
+        if (sorter === null && suppressError === false) {
+            throw new Error('Table not found.');
+        }
+
+        if (sorter) {
+            sorter.destroy();
+        }
+    };
+
+    /**
+     * Returns RowSorter object by table element.
+     *
+     * @param  {Element}        table
+     * @return {RowSorter|null}
+     */
+    function getSorterObject(table)
+    {
+        if (table instanceof RowSorter) {
+            return table;
+        }
+
         if (typeof table === 'string') {
             table = findTable(table);
         }
 
-        if (table !== null && helperAttrName in table && table[ helperAttrName ] instanceof RowSorter) {
-            table[ helperAttrName ].destroy();
+        if (is(table, 'table') && helperAttrName in table && table[ helperAttrName ] instanceof RowSorter) {
+            return table[ helperAttrName ];
         }
-    };
+        return null;
+    }
 
     /**
      * Searchs table by specified query.
@@ -415,10 +497,23 @@
     function findTable(query)
     {
         var elements = qsa(document, query);
-        if (elements.length > 0 && 'nodeName' in elements[0] && elements[0].nodeName === 'TABLE') {
+        if (elements.length > 0 && is(elements[0], 'table')) {
             return elements[0];
         }
         return null;
+    }
+
+    /**
+     * Is specified object an html element?
+     *
+     * @param  {object}  obj
+     * @param  {string}  tag
+     * @return {boolean}
+     */
+    function is(obj, tag)
+    {
+        return obj && typeof obj === 'object' &&
+            'nodeName' in obj && obj.nodeName === tag.toUpperCase();
     }
 
     /**
@@ -510,10 +605,10 @@
         }
 
         if (cls.indexOf(' ') !== -1) {
-            var classes = cls.split(' '),
+            var classes = cls.replace(/\s+/g, ' ').split(' '),
                 i = 0, len = classes.length;
             for (; i < len; i++) {
-                if (hasClass(element, classes[ i ]) == false) {
+                if (hasClass(element, classes[ i ]) === false) {
                     return false;
                 }
             }
@@ -541,7 +636,7 @@
         }
 
         if (cls.indexOf(' ') !== -1) {
-            var classes = cls.split(' '),
+            var classes = cls.replace(/\s+/g, ' ').split(' '),
                 i = 0, len = classes.length;
             for (; i < len; i++) {
                 addClass(element, classes[ i ]);
@@ -549,7 +644,7 @@
             return;
         }
 
-        if (hasClass(element, cls) == false) {
+        if (hasClass(element, cls) === false) {
             if (element.classList) {
                 element.classList.add(cls);
             } else {
@@ -572,7 +667,7 @@
         }
 
         if (cls.indexOf(' ') !== -1) {
-            var classes = cls.split(' '),
+            var classes = cls.replace(/\s+/g, ' ').split(' '),
                 i = 0, len = classes.length;
             for (; i < len; i++) {
                 removeClass(element, classes[ i ]);
@@ -584,8 +679,7 @@
             if (element.classList) {
                 element.classList.remove(cls);
             } else {
-                var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
-                element.className = element.className.replace(reg, ' ');
+                element.className = element.className.replace(new RegExp('(\\s|^)' + cls + '(\\s|$)'), ' ');
             }
         }
     }
@@ -684,7 +778,7 @@
                 return sorters.length === 1 ? sorters[0] : sorters;
             }
         });
-        $.rowSorter = {destroy: RowSorter.destroy};
+        $.rowSorter = {revert: RowSorter.revert, destroy: RowSorter.destroy};
     }
 
     return RowSorter;

@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>rowsorter.js</title>
+    <title>rowsorter.js - big table</title>
     <script type="text/javascript" src="../dist/RowSorter.js"></script>
 </head>
 <body>
@@ -21,7 +21,7 @@ table td.div > div {background-color: #b88;line-height:2;}
 <table class="sample_table">
     <thead>
         <tr>
-            <th colspan="4">Basic Sorting</th>
+            <th colspan="4">Big Table Sorting - 1000 Rows</th>
         </tr>
     </thead>
     <tbody>

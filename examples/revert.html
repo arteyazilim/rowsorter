@@ -2,8 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>rowsorter.js - jquery plugin</title>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <title>rowsorter.js - revert</title>
     <script type="text/javascript" src="../dist/RowSorter.js"></script>
 </head>
 <body>
@@ -17,10 +16,10 @@ table.sorting-table {cursor: move;}
 table tr.sorting-row td {background-color: #8b8;}
 </style>
 
-<table id="table1">
+<table id="sample_table">
     <thead>
         <tr>
-            <th colspan="3">Basic Sorting - jQuery Plugin</th>
+            <th colspan="3">Revert Last Operation</th>
         </tr>
     </thead>
     <tbody>
@@ -77,39 +76,16 @@ table tr.sorting-row td {background-color: #8b8;}
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="3" id="logarea">&nbsp;</td>
-        </tr>
-        <tr>
-            <td colspan="3"><button type="button" onclick="$.rowSorter.destroy('#table1', true);">Destroy way 1</button> <button type="button" onclick="destroyRowSorter();">Destroy way 2</button></td>
+            <td colspan="3">
+                <button type="button" onclick="RowSorter.destroy('#sample_table');">Destroy RowSorter</button>
+                <button type="button" onclick="RowSorter.revert('#sample_table');">Revert Last Move</button>
+            </td>
         </tr>
     </tfoot>
 </table>
 
 <script type="text/javascript">
-var logarea = document.getElementById("logarea");
-function log(text)
-{
-    logarea.innerHTML = text;
-}
-
-var sorter = $('#table1').rowSorter({
-    onDragStart: function(tbody, row, index)
-    {
-        //log('index: ' + index);
-        log('onDragStart: active row\'s index is ' + index);
-    },
-    onDrop: function(tbody, row, new_index, old_index)
-    {
-        //log('old_index: ' + old_index + ', new_index: ' + new_index);
-        log('onDrop: row moved from ' + old_index + ' to ' + new_index);
-    }
-});
-
-function destroyRowSorter()
-{
-    sorter.destroy();
-}
-
+RowSorter("#sample_table");
 </script>
 
 </body>

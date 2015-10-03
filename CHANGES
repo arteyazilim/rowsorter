@@ -1,4 +1,7 @@
-Changes in version 2
+Changes in version 2.1.0
+- New method: revert (reverts last dragged row to old position)
+
+Changes in version 2.0.0
 - jQuery is not required anymore. But if jQuery is defined in browser, RowSorter script registers itself as a jquery plugin.
 - Dropped "disabledClass" option. use handler option instead.
 - Dropped "onBeforeMove" option.
@@ -7,4 +10,4 @@ Changes in version 2
 - New option "tbody": when true, only tbody rows will be sortable. Rows of thead and tfoot wont be sortable.
 - Renamed option "tableDragClass" to "tableClass".
 - Renamed option "disabledRowClass" to "disabledClass".
-- The "handler" option is now accepts null. When null passed, it works like "tr".
+- The "handler" option is now accepts null.

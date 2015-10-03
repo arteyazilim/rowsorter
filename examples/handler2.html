@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>new rowsorter.js</title>
+    <title>rowsorter.js - handler 2</title>
     <script type="text/javascript" src="../dist/RowSorter.js"></script>
 </head>
 <body>
@@ -20,7 +20,7 @@ table tr.sorting-row td {background-color: #8b8;}
 <table id="table1">
     <thead>
         <tr>
-            <th colspan="3">Basic Sorting</th>
+            <th colspan="4">handler: 'span.sort-handler'</th>
         </tr>
     </thead>
     <tbody>
@@ -68,7 +68,7 @@ function log(text)
 }
 
 RowSorter('#table1', {
-    handler: '.sort-handler',
+    handler: 'span.sort-handler',
     stickFirstRow : true,
     stickLastRow  : false,
     onDragStart: function(tbody, row, index)
