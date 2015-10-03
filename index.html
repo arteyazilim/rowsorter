@@ -57,12 +57,16 @@
 <span class="pl-c">//// No Framework</span>
 <span class="pl-c">// Set table as sortable</span>
 <span class="pl-k">new</span> <span class="pl-en">RowSorter</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span><span class="pl-c">/*, options*/</span>);
+<span class="pl-c">// Revert last drag</span>
+RowSorter.revert(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
 <span class="pl-c">// Destroy sortable</span>
 RowSorter.destroy(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
 
-<span class="pl-c">//// jQuery</span>
+<span class="pl-c">//// jQuery Plugin</span>
 <span class="pl-c">// Set table as sortable</span>
 $(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>).rowSorter(<span class="pl-c">/*options*/</span>);
+<span class="pl-c">// Revert last drag</span>
+$.rowSorter.revert(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
 <span class="pl-c">// Destroy sortable</span>
 $.rowSorter.destroy(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
 <span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre></div>
@@ -117,6 +121,7 @@ $.rowSorter.destroy(<span class="pl-s"><span class="pl-pds">'</span>#table_id<sp
 <li><a href="http://borayazilim.com/projects/rowsorter/examples/style.html">Custom CSS</a></li>
 <li><a href="http://borayazilim.com/projects/rowsorter/examples/big_table.php">Big Table</a></li>
 <li><a href="http://borayazilim.com/projects/rowsorter/examples/touch_test.html">Mobile Sample</a></li>
+<li><a href="http://borayazilim.com/projects/rowsorter/examples/revert.html">Revert</a></li>
 </ul>
 
 <h3>
