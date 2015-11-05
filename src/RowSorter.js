@@ -62,6 +62,7 @@
             stickTopRows    : 0,
             stickBottomRows : 0,
             onDragStart     : null,
+            onDragEnd       : null,
             onDrop          : null
         };
 
@@ -123,7 +124,11 @@
         if (typeof this._options.onDrop !== 'function') {
             this._options.onDrop = null;
         }
-
+        
+        if (typeof this._options.onDragEnd !== 'function') {
+            this._options.onDragEnd = null;
+        }
+        
         if (typeof this._options.stickTopRows !== 'number' || this._options.stickTopRows < 0) {
             this._options.stickTopRows = 0;
         }
@@ -375,6 +380,10 @@
 
             if (this._options.onDrop) {
                 this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
+            }
+        } else {
+            if (this._options.onDragEnd) {
+                this._options.onDragEnd(this._tbody, this._draggingRow, new_index);
             }
         }
 
