@@ -1,57 +1,17 @@
 (function(root, factory) {
     'use strict';
     if (typeof define === 'function' && define.amd) {
-        // Require.js/AMD
         define('RowSorter', factory);
     } else if (typeof exports === 'object') {
-        // Node/CommonJS
         module.exports = factory();
     } else {
-        // Browser globals
         root.RowSorter = factory();
     }
 })(this, function() {
     'use strict';
 
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
-    if (!String.prototype.trim) {
-        String.prototype.trim = function()
-        {
-            return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
-        };
-    }
-
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
-    if (!Function.prototype.bind) {
-        Function.prototype.bind = function(oThis)
-        {
-            if (typeof this !== 'function') {
-                // closest thing possible to the ECMAScript 5
-                // internal IsCallable function
-                throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-            }
-
-            var aArgs   = Array.prototype.slice.call(arguments, 1),
-                fToBind = this,
-                fNOP    = function() {},
-                fBound  = function() {
-                    return fToBind.apply(
-                        this instanceof fNOP ? this : oThis,
-                        aArgs.concat(Array.prototype.slice.call(arguments))
-                    );
-                };
-
-            if (this.prototype) {
-                // native functions don't have a prototype
-                fNOP.prototype = this.prototype;
-            }
-
-            fBound.prototype = new fNOP();
-            return fBound;
-        };
-    }
-
     var $ = window.jQuery||false,
+        arrProto = Array.prototype,
         touchSupport = !!('ontouchstart' in document),
         helperAttrName = 'data-rowsorter',
         defaults = {
@@ -94,13 +54,13 @@
         this._lastSort = null;
         this._ended = true;
 
-        this._b_mousedown = this._mousedown.bind(this);
-        this._b_mousemove = this._mousemove.bind(this);
-        this._b_mouseup = this._mouseup.bind(this);
+        this._mousedown = bind(mousedown, this);
+        this._mousemove = bind(mousemove, this);
+        this._mouseup = bind(mouseup, this);
 
-        this._b_touchstart = this._touchstart.bind(this);
-        this._b_touchmove = this._touchmove.bind(this);
-        this._b_touchend = this._touchend.bind(this);
+        this._touchstart = bind(touchstart, this);
+        this._touchmove = bind(touchmove, this);
+        this._touchend = bind(touchend, this);
         this._touchId = null;
 
         this._table[ helperAttrName ] = this;
@@ -124,11 +84,11 @@
         if (typeof this._options.onDrop !== 'function') {
             this._options.onDrop = null;
         }
-        
+
         if (typeof this._options.onDragEnd !== 'function') {
             this._options.onDragEnd = null;
         }
-        
+
         if (typeof this._options.stickTopRows !== 'number' || this._options.stickTopRows < 0) {
             this._options.stickTopRows = 0;
         }
@@ -137,12 +97,12 @@
             this._options.stickBottomRows = 0;
         }
 
-        addEvent(this._table, 'mousedown', this._b_mousedown);
-        addEvent(document, 'mouseup', this._b_mouseup);
+        addEvent(this._table, 'mousedown', this._mousedown);
+        addEvent(document, 'mouseup', this._mouseup);
 
         if (touchSupport) {
-            addEvent(this._table, 'touchstart', this._b_touchstart);
-            addEvent(this._table, 'touchend', this._b_touchend);
+            addEvent(this._table, 'touchstart', this._touchstart);
+            addEvent(this._table, 'touchend', this._touchend);
         }
 
         // if document has onselectstart event (old-ie)
@@ -164,9 +124,9 @@
         }
     };
 
-    RowSorter.prototype._mousedown = function(e)
+    function mousedown(ev)
     {
-        var ev = e || window.event;
+        ev = ev || window.event;
         if (this._start(ev.target || ev.srcElement, ev.clientY)) {
             if (ev.preventDefault) {
                 ev.preventDefault();
@@ -176,9 +136,9 @@
             return false;
         }
         return true;
-    };
+    }
 
-    RowSorter.prototype._touchstart = function(ev)
+    function touchstart(ev)
     {
         if (ev.touches.length === 1) {
             var touch = ev.touches[0],
@@ -195,7 +155,7 @@
             }
         }
         return true;
-    };
+    }
 
     RowSorter.prototype._start = function(target, clientY)
     {
@@ -214,7 +174,7 @@
             // find the handlers
             var handlers = qsa(this._table, this._options.handler);
             // check targeted element in handlers
-            if (!handlers || inArray(target, handlers) === -1) {
+            if (!handlers || inArray(handlers, target) === -1) {
                 return false;
             }
         }
@@ -261,23 +221,23 @@
         this._ended = false;
 
         // attach events
-        addEvent(this._table, 'mousemove', this._b_mousemove);
+        addEvent(this._table, 'mousemove', this._mousemove);
 
         if (touchSupport) {
-            addEvent(this._table, 'touchmove', this._b_touchmove);
+            addEvent(this._table, 'touchmove', this._touchmove);
         }
 
         return true;
     };
 
-    RowSorter.prototype._mousemove = function(e)
+    function mousemove(ev)
     {
-        var ev = e || window.event;
+        ev = ev || window.event;
         this._move(ev.target || ev.srcElement, ev.clientY);
         return true;
-    };
+    }
 
-    RowSorter.prototype._touchmove = function(ev)
+    function touchmove(ev)
     {
         if (ev.touches.length === 1) {
             var touch = ev.touches[0],
@@ -288,7 +248,7 @@
             }
         }
         return true;
-    };
+    }
 
     RowSorter.prototype._move = function(target, clientY)
     {
@@ -309,7 +269,7 @@
             // if found any row
             // and hovered row is not the dragging row
             // and the hovered row is valid
-            if (hoveredRow && hoveredRow !== this._draggingRow && inArray(hoveredRow, this._rows) !== -1) {
+            if (hoveredRow && hoveredRow !== this._draggingRow && inArray(this._rows, hoveredRow) !== -1) {
 
                 var move = true;
                 if (this._options.stickTopRows > 0 || this._options.stickBottomRows > 0) {
@@ -335,17 +295,17 @@
         }
     };
 
-    RowSorter.prototype._mouseup = function()
+    function mouseup()
     {
         this._end();
-    };
+    }
 
-    RowSorter.prototype._touchend = function(ev)
+    function touchend(ev)
     {
         if (ev.changedTouches.length > 0 && this._touchId === ev.changedTouches[0].identifier) {
             this._end();
         }
-    };
+    }
 
     RowSorter.prototype._end = function()
     {
@@ -381,10 +341,8 @@
             if (this._options.onDrop) {
                 this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
             }
-        } else {
-            if (this._options.onDragEnd) {
-                this._options.onDragEnd(this._tbody, this._draggingRow, new_index);
-            }
+        } else if (this._options.onDragEnd) {
+            this._options.onDragEnd(this._tbody, this._draggingRow, this._oldIndex);
         }
 
         // remove stored active row
@@ -394,13 +352,15 @@
         this._ended = true;
 
         // attach events
-        removeEvent(this._table, 'mousemove', this._b_mousemove);
+        removeEvent(this._table, 'mousemove', this._mousemove);
 
         if (touchSupport) {
-            removeEvent(this._table, 'touchmove', this._b_touchmove);
+            removeEvent(this._table, 'touchmove', this._touchmove);
         }
     };
 
+    // @deprecated
+    // bad method name, use undo instead
     RowSorter.prototype.revert = function()
     {
         if (this._lastSort !== null) {
@@ -422,6 +382,8 @@
         }
     };
 
+    RowSorter.prototype.undo = RowSorter.prototype.revert;
+
     RowSorter.prototype.destroy = function()
     {
         this._table[ helperAttrName ] = null;
@@ -430,12 +392,12 @@
             this._end();
         }
 
-        removeEvent(this._table, 'mousedown', this._b_mousedown);
-        removeEvent(document, 'mouseup', this._b_mouseup);
+        removeEvent(this._table, 'mousedown', this._mousedown);
+        removeEvent(document, 'mouseup', this._mouseup);
 
         if (touchSupport) {
-            removeEvent(this._table, 'touchstart', this._b_touchstart);
-            removeEvent(this._table, 'touchend', this._b_touchend);
+            removeEvent(this._table, 'touchstart', this._touchstart);
+            removeEvent(this._table, 'touchend', this._touchend);
         }
     };
 
@@ -449,6 +411,8 @@
         return null;
     };*/
 
+    // @deprecated
+    // bad method name, use undo instead
     RowSorter.revert = function(table, suppressError)
     {
         var sorter = getSorterObject(table);
@@ -461,6 +425,8 @@
             sorter.revert();
         }
     };
+
+    RowSorter.undo = RowSorter.revert;
 
     RowSorter.destroy = function(table, suppressError)
     {
@@ -568,8 +534,6 @@
     /**
      * Attachs an event to an element.
      *
-     * @source http://ejohn.org/projects/flexible-javascript-events/
-     *
      * @param {Element}  element
      * @param {string}   type
      * @param {Function} fn
@@ -599,6 +563,11 @@
         }
     }
 
+    function trim(str)
+    {
+        return str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    }
+
     /**
      * Checks an element has a class.
      *
@@ -608,7 +577,7 @@
      */
     function hasClass(element, cls)
     {
-        cls = cls.trim();
+        cls = trim(cls);
         if (cls === '') {
             return false;
         }
@@ -639,7 +608,7 @@
      */
     function addClass(element, cls)
     {
-        cls = cls.trim();
+        cls = trim(cls);
         if (cls === '') {
             return;
         }
@@ -670,7 +639,7 @@
      */
     function removeClass(element, cls)
     {
-        cls = cls.trim();
+        cls = trim(cls);
         if (cls === '') {
             return;
         }
@@ -693,8 +662,18 @@
         }
     }
 
+    function bind(fn, context)
+    {
+        if (Function.prototype.bind) {
+            return fn.bind(context);
+        }
+        return function () {
+            fn.apply(context, arrProto.slice.call(arguments));
+        };
+    }
+
     /**
-     * Extends an abject.
+     * Extends an object.
      *
      * @param  {Object} base Main Object
      * @param  {Object} from Extender Object
@@ -747,14 +726,14 @@
      */
     function closest(element, tag)
     {
-        var i = 0, max = 20, found = element;
+        var c = 1, max = 20, found = element;
         tag = tag.toLowerCase();
         while (found.tagName && found.tagName.toLowerCase() !== tag) {
-            if (i > max || !found.parentNode) {
+            if (c > max || !found.parentNode) {
                 return null;
             }
             found = found.parentNode;
-            i++;
+            c++;
         }
         return found;
     }
@@ -762,12 +741,16 @@
     /**
      * Search in array
      *
-     * @param  {mixed} search
-     * @param  {Array} arr
-     * @return {Boolean}
+     * @param  {Array}  arr
+     * @param  {mixed}  search
+     * @return {Number}
      */
-    function inArray(search, arr)
+    function inArray(arr, search)
     {
+        if (arrProto.indexOf) {
+            return arrProto.indexOf.call(arr, search);
+        }
+
         for (var i = 0, len = arr.length; i < len; i++) {
             if (search === arr[ i ]) {
                 return i;
@@ -787,7 +770,7 @@
                 return sorters.length === 1 ? sorters[0] : sorters;
             }
         });
-        $.rowSorter = {revert: RowSorter.revert, destroy: RowSorter.destroy};
+        $.rowSorter = {undo: RowSorter.undo, revert: RowSorter.revert, destroy: RowSorter.destroy};
     }
 
     return RowSorter;

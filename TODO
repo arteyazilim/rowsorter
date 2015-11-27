@@ -1,0 +1,5 @@
+merge onDrop and onDragEnd handlers and rename to onDragEnd.
+onDragEnd should be called too if old_index and new_index is same value.
+    - let user to control the equality of old and new index.
+rename minified file to rowsorter.min.js
+remove RowSorter.revert method. use RowSorter.undo

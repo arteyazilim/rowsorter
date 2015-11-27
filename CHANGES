@@ -10,4 +10,4 @@ Changes in version 2.0.0
 - New option "tbody": when true, only tbody rows will be sortable. Rows of thead and tfoot wont be sortable.
 - Renamed option "tableDragClass" to "tableClass".
 - Renamed option "disabledRowClass" to "disabledClass".
-- The "handler" option is now accepts null.
+- The "handler" option accepts null.

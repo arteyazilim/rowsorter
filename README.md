@@ -41,6 +41,7 @@ $.rowSorter.destroy('#table_id');
     @number   stickTopRows    : count of top sticky rows (default: 0),
     @number   stickBottomRows : count of bottom sticky rows (default: 0),
     @function onDragStart     : (default: null)
+    @function onDragEnd       : (default: null)
     @function onDrop          : (default: null)
 
 #### Handling Events
@@ -53,7 +54,7 @@ $.rowSorter.destroy('#table_id');
 
         // old_index is zero-based index of row in tbody (or table if tbody not exists)
         console.log(table, row, old_index);
-    }
+    },
 
     // if new_index === old_index, this function won't be called.
     onDrop: function(tbody, row, new_index, old_index) {
@@ -65,6 +66,11 @@ $.rowSorter.destroy('#table_id');
         // old_index is stored index of row in table/tbody before start the dragging.
         // new_index is index of row in table/tbody after the row has been dragged.
         console.log(table, row, new_index, old_index);
+    },
+
+    // if new_index === old_index, this function will be called.
+    onDragEnd: function(tbody, row, current_index) {
+        console.log('Dragging the ' + current_index + '. row canceled.');
     }
 ```
 
