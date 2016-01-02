@@ -57,18 +57,18 @@
 <span class="pl-c">//// No Framework</span>
 <span class="pl-c">// Set table as sortable</span>
 <span class="pl-k">new</span> <span class="pl-en">RowSorter</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span><span class="pl-c">/*, options*/</span>);
-<span class="pl-c">// Revert last drag</span>
-<span class="pl-smi">RowSorter</span>.<span class="pl-en">revert</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
+<span class="pl-c">// Undo last drag</span>
+<span class="pl-smi">RowSorter</span>.<span class="pl-en">undo</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
 <span class="pl-c">// Destroy sortable</span>
 <span class="pl-smi">RowSorter</span>.<span class="pl-en">destroy</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
 
 <span class="pl-c">//// jQuery Plugin</span>
 <span class="pl-c">// Set table as sortable</span>
-$(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>).<span class="pl-en">rowSorter</span>(<span class="pl-c">/*options*/</span>);
-<span class="pl-c">// Revert last drag</span>
-$.<span class="pl-smi">rowSorter</span>.<span class="pl-en">revert</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
+<span class="pl-en">$</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>).<span class="pl-en">rowSorter</span>(<span class="pl-c">/*options*/</span>);
+<span class="pl-c">// Undo last drag</span>
+<span class="pl-smi">$</span>.<span class="pl-smi">rowSorter</span>.<span class="pl-en">undo</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
 <span class="pl-c">// Destroy sortable</span>
-$.<span class="pl-smi">rowSorter</span>.<span class="pl-en">destroy</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
+<span class="pl-smi">$</span>.<span class="pl-smi">rowSorter</span>.<span class="pl-en">destroy</span>(<span class="pl-s"><span class="pl-pds">'</span>#table_id<span class="pl-pds">'</span></span>);
 <span class="pl-k">&lt;</span><span class="pl-k">/</span>script<span class="pl-k">&gt;</span></pre></div>
 
 <h3>
