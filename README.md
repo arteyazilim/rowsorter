@@ -17,16 +17,16 @@ RowSorter.js
 //// No Framework
 // Set table as sortable
 new RowSorter('#table_id'/*, options*/);
-// Revert last drag
-RowSorter.revert('#table_id');
+// Undo last drag
+RowSorter.undo('#table_id');
 // Destroy sortable
 RowSorter.destroy('#table_id');
 
 //// jQuery Plugin
 // Set table as sortable
 $('#table_id').rowSorter(/*options*/);
-// Revert last drag
-$.rowSorter.revert('#table_id');
+// Undo last drag
+$.rowSorter.undo('#table_id');
 // Destroy sortable
 $.rowSorter.destroy('#table_id');
 </script>
