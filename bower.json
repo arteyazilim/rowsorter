@@ -1,6 +1,6 @@
 {
   "name": "rowsorter",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Drag & drop table row sorter pluging with touch support for Vanilla JS and jQuery.",
   "main": "dist/RowSorter.js",
   "keywords": [
