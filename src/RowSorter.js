@@ -19,6 +19,7 @@
             tbody           : true,
             tableClass      : 'sorting-table',
             dragClass       : 'sorting-row',
+            stickRowClass   : 'nodragdrop',
             stickTopRows    : 0,
             stickBottomRows : 0,
             onDragStart     : null,
@@ -181,6 +182,12 @@
 
         // find the closest row element.
         var draggingRow = closest(target, 'tr');
+
+        // do not drag and drop marked rows.
+        var rowClasses = draggingRow.className;
+        if (rowClasses.indexOf(this._options.stickRowClass) > -1) {
+            return false;
+        }
 
         // find current index
         var current_index = rowIndex(this._tbody, draggingRow);
