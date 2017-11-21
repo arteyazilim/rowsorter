@@ -164,6 +164,12 @@
             this._end();
         }
 
+        // If use clicks on SELECT, INPUT, BUTTON or A tags then 
+        // do not start drag operation. User has some UI elements in the grid.
+        if (isInputTag(target)) {
+            return false;
+        }
+
         // read rows
         this._rows = this._tbody.rows;
         if (this._rows.length < 2) {
@@ -236,6 +242,18 @@
 
         return true;
     };
+
+    function isInputTag(el) {
+        if (!el) {
+            return true;
+        }
+
+        return el.tagName === 'A'
+            || el.tagName === 'INPUT'
+            || el.tagName === 'SELECT'
+            || el.tagName === 'BUTTON'
+            || el.tagName === 'TEXTAREA';
+    }
 
     function mousemove(ev)
     {
