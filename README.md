@@ -67,6 +67,9 @@ $.rowSorter.destroy('#table_id');
         // old_index is stored index of row in table/tbody before start the dragging.
         // new_index is index of row in table/tbody after the row has been dragged.
         console.log(table, row, new_index, old_index);
+
+        // if the function returns false, the row won't be dropped
+        return false;
     },
 
     // if new_index === old_index, this function will be called.

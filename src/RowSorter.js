@@ -334,6 +334,8 @@
 
     RowSorter.prototype._end = function()
     {
+        var shouldRevert = false;
+
         // if there is not a draggingRow, kill the event.
         if (!this._draggingRow) {
             return true;
@@ -364,7 +366,11 @@
             };
 
             if (this._options.onDrop) {
-                this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
+                // user can rollback row drop if onDrop function returns false.
+                var dropResult = this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
+                if (dropResult === false) {
+                    shouldRevert = true;
+                }
             }
         } else if (this._options.onDragEnd) {
             this._options.onDragEnd(this._tbody, this._draggingRow, this._oldIndex);
@@ -382,12 +388,17 @@
         if (touchSupport) {
             removeEvent(this._table, 'touchmove', this._touchmove);
         }
+
+        if (shouldRevert === true) {
+            this.revert();
+        }
     };
 
     // @deprecated
     // bad method name, use undo instead
     RowSorter.prototype.revert = function()
     {
+        console.log(this._lastSort);
         if (this._lastSort !== null) {
             var lastSort = this._lastSort,
                 old_index = lastSort.oldIndex,
