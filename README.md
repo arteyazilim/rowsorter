@@ -38,6 +38,7 @@ $.rowSorter.destroy('#table_id');
     @boolean  tbody           : pass true if want to sort only tbody > tr. (default: true)
     @string   tableClass      : adds this class name to table while rows are sorting (default: "sorting-table")
     @string   dragClass       : dragging row's class name (default: "sorting-row").
+    @string   stickRowClass   : use this class name to stick rows, e.g. if you have multiple headers inside the table (default: "nodragdrop").
     @number   stickTopRows    : count of top sticky rows (default: 0),
     @number   stickBottomRows : count of bottom sticky rows (default: 0),
     @function onDragStart     : (default: null)
@@ -66,6 +67,9 @@ $.rowSorter.destroy('#table_id');
         // old_index is stored index of row in table/tbody before start the dragging.
         // new_index is index of row in table/tbody after the row has been dragged.
         console.log(table, row, new_index, old_index);
+
+        // if the function returns false, the row won't be dropped
+        return false;
     },
 
     // if new_index === old_index, this function will be called.

@@ -19,6 +19,7 @@
             tbody           : true,
             tableClass      : 'sorting-table',
             dragClass       : 'sorting-row',
+            stickRowClass   : 'nodragdrop',
             stickTopRows    : 0,
             stickBottomRows : 0,
             onDragStart     : null,
@@ -138,6 +139,22 @@
         return true;
     }
 
+    function findParentOf(target, tagName) {
+        if (!target) {
+            return null;
+        }
+
+        tagName = tagName.toUpperCase();
+        var parent = target.parentElement;
+        while (parent !== null) {
+            if (parent.tagName === tagName) {
+                return parent;
+            }
+
+            parent = parent.parentElement;
+        }
+    }
+
     function touchstart(ev)
     {
         if (ev.touches.length === 1) {
@@ -145,6 +162,12 @@
                 target = document.elementFromPoint(touch.clientX, touch.clientY);
 
             this._touchId = touch.identifier;
+
+            var parentLink = findParentOf(target, "A");
+            if (parentLink) {
+                target = parentLink;
+            }
+
             if (this._start(target, touch.clientY)) {
                 if (ev.preventDefault) {
                     ev.preventDefault();
@@ -161,6 +184,12 @@
     {
         if (this._draggingRow) {
             this._end();
+        }
+
+        // If use clicks on SELECT, INPUT, BUTTON or A tags then 
+        // do not start drag operation. User has some UI elements in the grid.
+        if (isInputTag(target)) {
+            return false;
         }
 
         // read rows
@@ -181,6 +210,12 @@
 
         // find the closest row element.
         var draggingRow = closest(target, 'tr');
+
+        // do not drag and drop marked rows.
+        var rowClasses = draggingRow.className;
+        if (rowClasses.indexOf(this._options.stickRowClass) > -1) {
+            return false;
+        }
 
         // find current index
         var current_index = rowIndex(this._tbody, draggingRow);
@@ -229,6 +264,18 @@
 
         return true;
     };
+
+    function isInputTag(el) {
+        if (!el) {
+            return true;
+        }
+
+        return el.tagName === 'A'
+            || el.tagName === 'INPUT'
+            || el.tagName === 'SELECT'
+            || el.tagName === 'BUTTON'
+            || el.tagName === 'TEXTAREA';
+    }
 
     function mousemove(ev)
     {
@@ -309,6 +356,8 @@
 
     RowSorter.prototype._end = function()
     {
+        var shouldRevert = false;
+
         // if there is not a draggingRow, kill the event.
         if (!this._draggingRow) {
             return true;
@@ -339,7 +388,11 @@
             };
 
             if (this._options.onDrop) {
-                this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
+                // user can rollback row drop if onDrop function returns false.
+                var dropResult = this._options.onDrop(this._tbody, this._draggingRow, new_index, this._oldIndex);
+                if (dropResult === false) {
+                    shouldRevert = true;
+                }
             }
         } else if (this._options.onDragEnd) {
             this._options.onDragEnd(this._tbody, this._draggingRow, this._oldIndex);
@@ -356,6 +409,10 @@
 
         if (touchSupport) {
             removeEvent(this._table, 'touchmove', this._touchmove);
+        }
+
+        if (shouldRevert === true) {
+            this.revert();
         }
     };
 
