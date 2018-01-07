@@ -139,6 +139,22 @@
         return true;
     }
 
+    function findParentOf(target, tagName) {
+        if (!target) {
+            return null;
+        }
+
+        tagName = tagName.toUpperCase();
+        var parent = target.parentElement;
+        while (parent !== null) {
+            if (parent.tagName === tagName) {
+                return parent;
+            }
+
+            parent = parent.parentElement;
+        }
+    }
+
     function touchstart(ev)
     {
         if (ev.touches.length === 1) {
@@ -146,6 +162,12 @@
                 target = document.elementFromPoint(touch.clientX, touch.clientY);
 
             this._touchId = touch.identifier;
+
+            var parentLink = findParentOf(target, "A");
+            if (parentLink) {
+                target = parentLink;
+            }
+
             if (this._start(target, touch.clientY)) {
                 if (ev.preventDefault) {
                     ev.preventDefault();
@@ -398,7 +420,6 @@
     // bad method name, use undo instead
     RowSorter.prototype.revert = function()
     {
-        console.log(this._lastSort);
         if (this._lastSort !== null) {
             var lastSort = this._lastSort,
                 old_index = lastSort.oldIndex,
