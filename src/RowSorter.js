@@ -488,7 +488,7 @@
     function is(obj, tag)
     {
         return obj && typeof obj === 'object' &&
-            'nodeName' in obj && obj.nodeName === tag.toUpperCase();
+            'nodeName' in obj && obj.nodeName.toUpperCase() === tag.toUpperCase();
     }
 
     /**
